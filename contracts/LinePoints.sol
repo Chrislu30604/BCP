@@ -15,7 +15,6 @@ contract LinePoint is ERC20Interface, Ownership {
     mapping(address => uint) balances;
     mapping(address => mapping(address => uint)) allowed;
     
-    // Constructor initiate
     constructor() public payable {
         symbol = "LIP";
         name = "LinePoint";
@@ -38,8 +37,6 @@ contract LinePoint is ERC20Interface, Ownership {
     
     
     // Transfer the balance from token owner's account to `to` account
-    // require : Owner's account must have sufficient balance to transfer
-    // require : transfer amount must larger than  0 value
     function transfer(address to, uint tokens) public returns (bool success) {
         require(balances[msg.sender] > 0);
         require(tokens > 0);
@@ -52,7 +49,7 @@ contract LinePoint is ERC20Interface, Ownership {
  
 
     // Returns the amount of tokens approved by the owner that can be transferred to the spender's account
-   function allowance(address tokenOwner, address spender) public view returns (uint remaining) {
+    function allowance(address tokenOwner, address spender) public view returns (uint remaining) {
         return allowed[tokenOwner][spender];
     }
     

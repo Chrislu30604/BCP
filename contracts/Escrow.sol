@@ -13,6 +13,5 @@ contract Escrow {
     
     function escrowInfo() public view returns(address) {
         return address(this);
-    }
-    
+    }   
 }
