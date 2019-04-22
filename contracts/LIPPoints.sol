@@ -1,45 +1,39 @@
 pragma solidity ^0.5.0;
-
+ 
 import "browser/SafeMath.sol";
-import "browser/ERC20Interface.sol";
 import "browser/Ownership.sol";
+import 'browser/ERC20LIPInterface.sol';
 
-contract CharityPoint is ERC20Interface, Ownership {
+contract LIP is ERC20LIPInterface, Ownership {
     using SafeMath for uint;
  
     string public symbol;
     string public  name;
     uint public decimals;
-    uint public exchangeRate;
     uint _totalSupply;
-    
     mapping(address => uint) balances;
     mapping(address => mapping(address => uint)) allowed;
     
-    // Constructor initiate
+    // Constructor Initiate
     constructor() public payable {
-        symbol = "CPP";
-        name = "CharityPoint";
+        symbol = "LIP";
+        name = "LinePoints";
         decimals = 18;
-        _totalSupply = 2000 * 10**uint(decimals); // wei
-        exchangeRate = 2; // 1 LPP = 2 CPP
-        balances[owner] = _totalSupply;
-        allowed[owner][address(this)] = _totalSupply;
-        emit Transfer(address(0), owner, _totalSupply);
-        emit Approval(owner, address(this), _totalSupply);
+        _totalSupply = 1000 * 10**uint(decimals);
+        
+        // Release all the token to contract address
+        balances[address(this)] = _totalSupply;
+        emit Transfer(address(0), address(this), _totalSupply);
     }
     
     function totalSupply() public view returns (uint) {
         return _totalSupply.sub(balances[address(0)]);
     }
     
-    
     function balanceOf(address tokenOwner) public view returns (uint balance) {
         return balances[tokenOwner];
     }
-    
-    
-    // Transfer the balance from token owner's account to `to` account
+
     function transfer(address to, uint tokens) public returns (bool success) {
         require(balances[msg.sender] > 0);
         require(tokens > 0);
@@ -50,28 +44,16 @@ contract CharityPoint is ERC20Interface, Ownership {
         return true;
     }
 
-    
-    // Returns the amount of tokens approved by the owner that can be transferred to the spender's account
     function allowance(address tokenOwner, address spender) public view returns (uint remaining) {
         return allowed[tokenOwner][spender];
     }
-    
-    
-    // Token owner can approve for `spender` to transferFrom(...) `tokens` from the token owner's account
+
     function approve(address spender, uint tokens) public returns (bool success) {
         allowed[msg.sender][spender] = tokens;
         emit Approval(msg.sender, spender, tokens);
         return true;
     }
-    
-    function approveExchangeContract(address exchangeContract) public onlyOwner returns (bool succss) {
-        allowed[msg.sender][exchangeContract] = _totalSupply;
-        emit Approval(msg.sender, exchangeContract, _totalSupply);
-        return true;
-    }
-    
-   
-    // Transfer `tokens` from the `from` account to the `to` account
+
     function transferFrom(address from, address to, uint tokens) public returns (bool success) {
         require(balances[from] > 0);
         require(allowed[from][msg.sender] > 0);
@@ -84,14 +66,31 @@ contract CharityPoint is ERC20Interface, Ownership {
         return true;
     }
     
-    // Fallback Function : This ERC20 don't accept ETH
-    function () external payable {
-        revert();
+    
+    /*-----------------Additional Function-----------------*/
+    function distributePoints(address to, uint tokens) public onlyOwner returns (bool success) {
+        require(balances[address(this)] > tokens);
+        require(tokens > 0);
+        
+        balances[address(this)] = balances[address(this)].sub(tokens);
+        balances[to] = balances[to].add(tokens);
+        emit Transfer(address(this), to, tokens);
+        return true;   
     }
     
-
-    // Owner can transfer out any accidentally sent ERC20 tokens
-    function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
-        return ERC20Interface(tokenAddress).transfer(owner, tokens);
+    function transferFromContract(address from, address to, uint tokens) public returns (bool success) {
+        require(balances[from] >= tokens);
+        require(tokens > 0);
+        
+        balances[from] = balances[from].sub(tokens);
+        balances[to] = balances[to].add(tokens);
+        emit Transfer(from, to, tokens);
+        return true;   
+    }
+    
+    
+    // Fallback Function
+    function () external payable {
+        revert();
     }
 }
