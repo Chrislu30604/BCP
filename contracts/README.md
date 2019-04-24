@@ -24,9 +24,9 @@ CharityPlatform.sol -> LinePoints.sol  ERC_Line_Interface.sol
 
 ## Function
 
-- ***CharityPlatform.sol:***
+- **CharityPlatform.sol:**
 
-  - $addMissionList(string memory_name, uint_targetFund):  
+  - $addMissionList(string memory_name, uint_targetFund):
 
 	新創一個募款專案  
 	\_name -> 捐款項目名稱  
@@ -59,7 +59,7 @@ CharityPlatform.sol -> LinePoints.sol  ERC_Line_Interface.sol
   	get Mission's Address
 
 
-- ***Exchange.sol:***
+- **Exchange.sol:**
 
 	- $ExChange_Charity(address LPPAddr ,address CPPAddr ,uint tokenValue):
 
@@ -69,34 +69,34 @@ CharityPlatform.sol -> LinePoints.sol  ERC_Line_Interface.sol
 		tokenValue -> 要換多少 LINE Points  
 
 
-- ***SafeMath.sol:***
+- **SafeMath.sol:**
 
 	避免 Overflow and Underflow
 
 
-- ***Ownership.sol:***
+- **Ownership.sol:**
 
 	權限管理
 
 
-- ***LinePoints.sol:***
+- **LinePoints.sol:**
 
 	生成 LINE Points 的合約 (先用 ERC20 的方式模擬現實生活的 LINE Points)  
 
 
-- ***CharityPoint.sol:***
+- **CharityPoint.sol:**
 
 	生成 Charity Points 的合約  
 
 
-- ***Escrow.sol:***
+- **Escrow.sol:**
 
 	生成新募款項目地址
 
-- ***ERC_Line_Interface.sol:***
+- **ERC_Line_Interface.sol:**
 
-	LINE Points 的統一規範  
+	Describe:LINE Points的統一規範
 
-- ***ERC_Charity_Interface.sol:***
+- **ERC_Charity_Interface.sol:**
 
-	Charity Tokens 的統一規範
+	Describe:Charity Tokens的統一規範
