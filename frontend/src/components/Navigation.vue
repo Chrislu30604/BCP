@@ -22,7 +22,7 @@
     </v-navigation-drawer>
     <v-toolbar app fixed clipped-left color="transparent" flat scroll-off-screen>
       <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
-      <v-toolbar-title v-on:click="routeToHome" flat >Application</v-toolbar-title>
+      <v-toolbar-title v-on:click="routeToHome" flat >BCP</v-toolbar-title>
       <v-spacer class="hidden-md-and-down"></v-spacer>
       <v-btn flat class="hidden-md-and-down white--text button">ABOUT</v-btn>
       <v-menu transition="slide-y-transition" bottom right>
@@ -36,8 +36,7 @@
           </v-list-tile>
         </v-list>
       </v-menu>
-      <v-btn flat class="hidden-md-and-down white--text button">TRACE</v-btn>
-      <v-btn flat class="hidden-md-and-down white--text button">LOGIN</v-btn>
+      <v-btn v-on:click="routeToAccount" flat class="hidden-md-and-down white--text button">ACCOUNT</v-btn>
     </v-toolbar>
   </div>
 </template>
@@ -62,7 +61,10 @@ export default {
     },
     routeToLaunch() {
       this.$router.push("/launch");
-    }
+    },
+    routeToAccount() {
+      this.$router.push("/account")
+    },
   }
 };
 </script>
