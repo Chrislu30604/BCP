@@ -3,7 +3,7 @@
     <v-container fluid fill-height id="account">
       <div id="sidebar">
         <div v-for="(item, idx) in sideOption" :key="idx" class="sidewrap">
-          <i class="icon fas fa-user-alt"></i>
+          <i :class="item.icon" v-on:click="select($event, item.title)"></i>
           <p>{{ item.title }}</p>
         </div>
       </div>
@@ -82,6 +82,51 @@
             </div>
             <div id="information">
                 <h2>ACCOUNT INFORMATION</h2>
+                <v-form>
+                    <v-text-field
+                        v-model="user.username"
+                        v-validate="'required|max:20|alpha_spaces'"
+                        :counter="20"
+                        data-vv-name="username"
+                        :error-messages="errors.collect('username')"
+                        color="cyan"
+                        prepend-icon="account_circle"
+                        placeholder="Full Name"
+                        class="input_text"
+                    ></v-text-field>
+                    <v-text-field
+                        v-model="user.company"
+                        v-validate="'required|alpha_space'"
+                        data-vv-name="company"
+                        :error-messages="errors.collect('company')"
+                        color="cyan"
+                        prepend-icon="home"
+                        placeholder="Company"
+                        class="input_text"
+                    ></v-text-field>
+                    <v-text-field
+                        v-model="user.phone"
+                        v-validate="'required|numeric'"
+                        data-vv-name="phone"
+                        :error-messages="errors.collect('phone')"
+                        color="cyan"
+                        prepend-icon="phone_in_talk"
+                        placeholder="Phone"
+                        class="input_text"
+                    ></v-text-field>
+                    <v-text-field
+                        v-model="user.profile_url"
+                        v-validate="'required'"
+                        data-vv-name="profile_url"
+                        :error-messages="errors.collect('profile_url')"
+                        color="cyan"
+                        prepend-icon="whatshot"
+                        placeholder="Profile Url"
+                        class="input_text"
+                    ></v-text-field>
+                    <div class="divider"></div>
+                    <v-btn style="" color="warning">Submit</v-btn>
+                </v-form>
             </div>
         </div>
       </div>
@@ -98,11 +143,13 @@ export default {
   },
   data() {
     return {
+      selected: "Overview",
+      lastClick: "",
       sideOption: [
-        { title: "Overview", icon: "", method: "" },
-        { title: "Donation", icon: "", method: "" },
-        { title: "Detail", icon: "", method: "" },
-        { title: "Exchange", icon: "", method: "" }
+        { title: "Overview", icon: "icon fas fa-user-alt", method: "" },
+        { title: "History", icon: "icon fas fa-history", method: "" },
+        { title: "Detail", icon: "icon fas fa-kiwi-bird", method: "" },
+        { title: "Exchange", icon: "icon fas fa-search-dollar", method: "" }
       ],
       user: {
           email: "chrislu30604@gmail.com",
@@ -110,9 +157,30 @@ export default {
           password: "",
           new_password: "",
           match_password: "",
+          username: "",
+          company: "",
+          phone: "",
+          profile_url: "",
       },
     };
-  }
+  },
+  methods: {
+    select (event, name) {
+      let lastEvent = this.lastClick;
+      if (lastEvent == "") {
+        lastEvent = event;
+      }
+      if (event == lastEvent) {
+
+      }
+      else {
+        lastEvent.target.style.background = "#ff6d00";      
+        this.selected = name;
+        event.target.style.background = "#ffb74d"; // change new click color
+        this.lastClick = event;
+      }
+    }
+  },
 };
 </script>
 
