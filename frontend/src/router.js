@@ -4,6 +4,7 @@ import Home from './views/Home.vue'
 import Project from './views/Project.vue'
 import Launch from './views/Launch.vue'
 import Account from './views/Account.vue'
+import Login from './views/Login.vue'
 
 Vue.use(Router)
 
@@ -35,6 +36,11 @@ export default new Router({
       path: '/account',
       name: 'account',
       component: Account 
-    }
+    },
+    {
+      path: '/login',
+      name: 'login',
+      component: Login,
+    },
   ]
 })
