@@ -62,6 +62,7 @@ export default {
       ],
       account: [
         { title: "Login", von: this.routeToLogin },
+        { title: "Register", von: this.routeToRegister},
         { title: "Info", von: this.routeToAccount },
       ],
       drawer: false
@@ -82,6 +83,9 @@ export default {
     },
     routeToLogin() {
       this.$router.push("/login")
+    },
+    routeToRegister() {
+      this.$router.push("/register")
     },
   }
 };

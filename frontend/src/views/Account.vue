@@ -20,7 +20,7 @@
             <h2>EMAILS</h2>
             <v-form>
               <v-text-field
-                v-validate="'required|max:20'"
+                v-validate="'required'"
                 data-vv-name="email"
                 :error-messages="errors.collect('email')"
                 v-model="user.email"
@@ -30,7 +30,7 @@
                 required
               ></v-text-field>
               <v-text-field
-                v-validate="'required|max:20'"
+                v-validate="'required'"
                 data-vv-name="new_email"
                 :error-messages="errors.collect('new_email')"
                 v-model="user.new_email"
@@ -247,7 +247,7 @@ export default {
       this.lastClick = event;
     },
     submit_exchange() {
-      this.$validator.validateAll().then((result) => {
+      this.$validator.validateAll().then((valid) => {
         // console.log(this.user.ex_linepoint);
       })
     }
