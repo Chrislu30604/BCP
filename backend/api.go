@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// User defined the launch project content
 type User struct {
 	Name        string `json:"name"`
 	Email       string `json:"email"`
@@ -14,6 +15,20 @@ type User struct {
 	Dollars     string `json:"dollars"`
 	Enddate     string `json:"enddate"`
 	Description string `json:"description"`
+}
+
+// RegisterUser define user's detail
+type RegisterUser struct {
+	Base struct {
+		ID       string `json:"id"`
+		Password string `json:"password"`
+		Email    string `json:"email"`
+	}
+	Detail struct {
+		Name           string `json:"name"`
+		Identification string `json:"Identification"`
+		Birth          string `json:"Birth"`
+	}
 }
 
 func handlePropose(c *gin.Context) {
@@ -26,4 +41,8 @@ func handlePropose(c *gin.Context) {
 	json.Unmarshal(rawdata, &parser)
 
 	log.Println(parser)
+}
+
+func handleQueryName(c *gin.Context) {
+
 }

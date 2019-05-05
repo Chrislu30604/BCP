@@ -6,12 +6,15 @@
           <img v-if="pass==0" src="../assets/chicken_small.svg">
           <img v-if="pass==1" src="../assets/chicken.svg">
           <img v-if="pass==2" src="../assets/chicken_hot.svg">
-          <div>
+          <div v-if="pass!=2">
             <h2>Register BCP</h2>
             <p>
               If you already have BCP account, click
               <router-link to="/login">sigin</router-link>
             </p>
+          </div>
+          <div v-else>
+            <h2>You succeesfully register!</h2>
           </div>
         </div>
         <v-form v-if="pass==0" style="margin-bottom:30px;width:320px;">
@@ -92,7 +95,7 @@
             required
           ></v-text-field>
         </v-form>
-        <v-btn color="info" depressed @click="submit_continue">continue</v-btn>
+        <v-btn v-if="pass!=2" color="info" depressed @click="submit_continue">continue</v-btn>
 
       </div>
     </v-container>
@@ -124,11 +127,27 @@ export default {
     };
   },
   methods: {
+    success() {
+      this.pass = this.pass + 1
+      this.progress_bar = this.progress_bar + 33
+    },
     submit_continue() {
       this.$validator.validateAll().then((valid) => {
         if(valid) {
-          this.pass = this.pass + 1
-          this.progress_bar = this.progress_bar + 33
+          if(pass == 1) {
+            const url = "http://127.0.0.1:8081/register/queryName";
+            let obj = this.register;
+            this.axios.post(url, {
+            id: obj.id,
+            password: obj.password,
+            email: obj.email
+          }).then(function (response) {
+            console.log(response);
+          }).catch(function (error) {
+            console.log(error);
+          });
+
+          }
         }
       })
     },
