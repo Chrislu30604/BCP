@@ -202,6 +202,8 @@
 
 <script>
 import Avatar from "vue-avatar";
+import Networks from "../web3/networks"
+import {mapState} from 'vuex'
 
 export default {
   components: {
@@ -233,6 +235,19 @@ export default {
       }
     };
   },
+
+  computed: {
+    ...mapState({
+      isInjected: state => state.web3.isInjected,
+      network: state => Networks[state.web3.networkId],
+      coinbase: state => state.web3.coinbase,
+      balance: state => state.web3.balance,
+      ethBalance: state => {
+        if(state.web3.web3Instance !== null) return state.web3.web3Instance().fromWei(state.web3.balance, 'ether')
+      }
+    })
+  },
+
   methods: {
     select(event, name) {
       let lastEvent = this.lastClick;
