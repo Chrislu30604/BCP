@@ -1,10 +1,10 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import state from './state'
-import getWeb3 from '../web3/getWeb3'
+import web3Obj from '../web3/getWeb3'
 import pollWeb3 from '../web3/pollWeb3'
 
-import getContract from '../web3/getContract'
+import getExchangeContract from '../web3/getExchangeContract'
 
 Vue.use(Vuex)
 
@@ -22,14 +22,14 @@ export const store = new Vuex.Store({
       web3_state.isInjected = result.isInjected
       web3_state.web3Instance = result.web3
       state.web3 = web3_state
-      pollWeb3()
+      //  this.store.dispatch('pollWeb3')
     },
     pollWeb3Instance(state, payload) {
       console.log('pollWeb3Instance mutation being executed', payload)
       state.web3.coinbase = payload.coinbase
       state.web3.balance = parseInt(payload.balance, 10)
     },
-    registerContractInstance(state, payload) {
+    registerExchangeContractInstance(state, payload) {
       console.log('Exchange account instace:', payload)
       state.contractInstance = () => payload
     }
@@ -37,7 +37,7 @@ export const store = new Vuex.Store({
   actions: {
     registerWeb3 ({commit}) {
       console.log('Register Web3 Action being executed')
-      getWeb3.then(result => {
+      web3Obj.initWeb3().then(result => {
         console.log('register web3 Instance', result)
         commit('registerWeb3Instance', result)
       }).catch(e => {
@@ -48,9 +48,9 @@ export const store = new Vuex.Store({
       console.log('pollWeb3 action being executed')
       commit('pollWeb3Instance', payload)
     },
-    getContractInstance({commit}) {
-      getContract.then(result => {
-        commit('registerContractInstance', result)
+    getExchangeContractInstance({commit}) {
+      getExchangeContract().then(result => {
+        commit('registerExchangeContractInstance', result)
       }).catch(e => console.log(e))
     }
   }

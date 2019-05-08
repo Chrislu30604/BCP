@@ -15,7 +15,7 @@
             <span>Member since Aug 09, 2018</span>
           </div>
         </div>
-        <div id="overview" v-if="selected == 'Overview'">
+        <div id="overview" v-if="selected === 'Overview'">
           <div id="email-passw">
             <h2>EMAILS</h2>
             <v-form>
@@ -96,7 +96,7 @@
               ></v-text-field>
               <v-text-field
                 v-model="user.company"
-                v-validate="'required|alpha_space'"
+                v-validate="'required|alpha_spaces'"
                 data-vv-name="company"
                 :error-messages="errors.collect('company')"
                 color="cyan"
@@ -130,7 +130,7 @@
           </div>
         </div>
         <div id="exchange" v-else-if="selected == 'Exchange'">
-          <h2 id="currency_header">YOUR CURRENCY</h2>
+          <h2 id="currency_header">YOUR CURRENCY & ACCOUNT</h2>
           <div id="Lcurrency">
             <v-layout row>
               <v-flex xs6>
@@ -146,10 +146,6 @@
                   class="input_text"
                 ></v-text-field>
               </v-flex>
-            </v-layout>
-          </div>
-          <div id="Bcurrency">
-            <v-layout row>
               <v-flex xs6>
                 <v-subheader>BCP Point</v-subheader>
               </v-flex>
@@ -164,6 +160,15 @@
                 ></v-text-field>
               </v-flex>
             </v-layout>
+          </div>
+          <div id="Bcurrency">
+            <div class='metamask-info'>
+              <p v-if="isInjected" id="has-metamask"><i aria-hidden="true" class="fa fa-check"></i> Metamask installed</p>
+              <p v-else id="no-metamask"><i aria-hidden="true" class="fa fa-times"></i> Metamask not found</p>
+              <p>Network: {{ network }}</p>
+              <p>Account: {{ coinbase }}</p>
+              <p>Balance: {{ balance }} Wei </p>
+            </div>
           </div>
           <h2 id="exchange_header">EXCHANGE CURRENCY</h2>
           <div id="linepoint">
@@ -203,6 +208,7 @@
 <script>
 import Avatar from "vue-avatar";
 import {mapState} from 'vuex'
+import {Networks} from '../web3/networks'
 
 export default {
   components: {
@@ -235,18 +241,6 @@ export default {
     };
   },
 
-  computed: {
-    ...mapState({
-      isInjected: state => state.web3.isInjected,
-      network: state => Networks[state.web3.networkId],
-      coinbase: state => state.web3.coinbase,
-      balance: state => state.web3.balance,
-      ethBalance: state => {
-        if(state.web3.web3Instance !== null) return state.web3.web3Instance().fromWei(state.web3.balance, 'ether')
-      }
-    })
-  },
-
   methods: {
     select(event, name) {
       let lastEvent = this.lastClick;
@@ -266,11 +260,24 @@ export default {
     },
     submit_exchange() {
       this.$validator.validateAll().then((valid) => {
-        // console.log(this.user.ex_linepoint);
+        if(valid) {
+          console.log("submit exchange");
+          this.$store.dispatch('getExchangeContractInstance')
+        }
       })
     }
   },
   computed: {
+    ...mapState({
+      isInjected: state => state.web3.isInjected,
+      network: state => Networks[state.web3.networkId],
+      coinbase: state => state.web3.coinbase,
+      balance: state => state.web3.balance,
+      ethBalance: state => {
+        if(state.web3.web3Instance !== null) return state.web3.web3Instance().fromWei(state.web3.balance, 'ether')
+      }
+    }),
+
     exCurrency: {
       get() {
         return this.user.ex_linepoint * 2;
@@ -290,6 +297,12 @@ export default {
 
 
 <style lang="scss">
+#has-metamask {
+  color: green;
+}
+#no-metamask {
+  color:red
+}
 .input_text {
   width: 80%;
 }
@@ -304,7 +317,7 @@ export default {
 #account {
   width: 70%;
   display: grid;
-  grid-template-columns: 120px 900px;
+  grid-template-columns: 120px auto;
   grid-column-gap: 100px;
 }
 #sidebar {
@@ -360,9 +373,10 @@ export default {
   height: 80%;
   padding: 32px;
   display: grid;
-  grid-template-rows: 15% 85%;
+  grid-template-rows: 80px auto;
   box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
   transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+  overflow: hidden;
 
   #header {
     grid-row-start: 1;
@@ -392,8 +406,8 @@ export default {
   }
 
   #exchange {
-    display: grid;
-    grid-template-rows: 10% 15% 10% 50% 15%;
+    display: grid; //  10% 15% 10% 50% 15%
+    grid-template-rows: 60px 90px 60px 200px auto;
     grid-template-columns: 1fr 1fr;
 
     h2 {
@@ -401,6 +415,11 @@ export default {
       font-weight: 500;
     }
 
+    .metamask-info{
+      p {
+        line-height: 10px;
+      }
+    }
     #currency_header {
       grid-row-start: 1;
       grid-row-end: 2;
@@ -427,7 +446,6 @@ export default {
       grid-row-end: 3;
       grid-column-start: 2;
       grid-column-end: 3;
-      padding: 30px;
     }
     #linepoint {
       display: flex;
@@ -451,7 +469,8 @@ export default {
       grid-column-start: 1;
       grid-column-end: 3;
       display: flex;
-      justify-content: center;
+      justify-content: space-around;
+      align-items: flex-start;
     }
   }
 }

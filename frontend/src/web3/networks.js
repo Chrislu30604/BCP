@@ -1,4 +1,4 @@
-export const NETWORKS = {
+export const Networks = {
  '1': 'Main Net',
  '2': 'Deprecated Morden test network',
  '3': 'Ropsten test network',
