@@ -3,7 +3,8 @@ import Vuex from 'vuex'
 import state from './state'
 import getWeb3 from '../web3/getWeb3'
 import pollWeb3 from '../web3/pollWeb3'
-import getContract from '../web3/pollWeb3'
+
+import getContract from '../web3/getContract'
 
 Vue.use(Vuex)
 

@@ -202,7 +202,6 @@
 
 <script>
 import Avatar from "vue-avatar";
-import Networks from "../web3/networks"
 import {mapState} from 'vuex'
 
 export default {
@@ -260,6 +259,10 @@ export default {
       this.selected = name;
       event.target.style.background = "#ffb74d"; // change new click color
       this.lastClick = event;
+      if(this.selected === "Exchange") {
+        console.log("-----MetaMask------")
+        this.$store.dispatch('registerWeb3') 
+      }
     },
     submit_exchange() {
       this.$validator.validateAll().then((valid) => {
