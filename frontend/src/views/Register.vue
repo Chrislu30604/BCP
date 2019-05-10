@@ -123,7 +123,7 @@ export default {
         birth: '',
       },
       progress_bar: 33,
-      pass: 0,
+      pass: 1,
     };
   },
   methods: {
@@ -134,7 +134,8 @@ export default {
     submit_continue() {
       this.$validator.validateAll().then((valid) => {
         if(valid) {
-          if(pass == 1) {
+          if(this.pass == 1) {
+            console.log("post queryName")
             const url = "http://127.0.0.1:8081/register/queryName";
             let obj = this.register;
             this.axios.post(url, {

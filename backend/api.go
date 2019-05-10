@@ -44,5 +44,12 @@ func handlePropose(c *gin.Context) {
 }
 
 func handleQueryName(c *gin.Context) {
-
+	parser := RegisterUser{Base{}}
+	rawdata, err := c.GetRawData()
+	if err != nil {
+		panic(err)
+	}
+	log.Println(string(rawdata))
+	json.Unmarshal(rawdata, &parser)
+	log.Println(parse)
 }
