@@ -33,6 +33,7 @@ func main() {
 	reg := router.Group("/register")
 	{
 		reg.POST("/queryName", handleQueryName)
+		reg.POST("/register", handleRegister)
 	}
 
 	router.Run(":8081")

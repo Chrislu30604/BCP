@@ -21,7 +21,7 @@
         <!-------------->
         </div>
         <!-- Component -->
-        <div v-else-if="selected == 'Exchange'">
+        <div v-else-if="selected === 'Exchange'">
           <Exchange/>
         <!-------------->
         </div>
