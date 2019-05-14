@@ -17,8 +17,8 @@
             <h2>You succeesfully register!</h2>
           </div>
         </div>
-        <RegisterName v-if="pass==0" v-on:triggerSuccess="success"></RegisterName>
-        <RegisterDetail v-if="pass==1" v-on:triggerSuccess="success"></RegisterDetail>
+        <RegisterName v-if="pass==0" v-on:triggerSuccess="success_and_next"></RegisterName>
+        <RegisterDetail v-if="pass==1" v-on:triggerSuccess="post_and_next"></RegisterDetail>
       </div>
     </v-container>
     <v-footer style="position:absolute;bottom:0px;width:100%">
@@ -35,7 +35,15 @@ export default {
   data() {
     return {
       progress_bar: 33,
-      pass: 0
+      pass: 0,
+      register: {
+        id: "",
+        password: "",
+        email: "",
+        name: "",
+        identification: "",
+        birth: "",
+      }
     };
   },
   components: {
@@ -48,6 +56,29 @@ export default {
       this.pass = this.pass + 1;
       this.progress_bar = this.progress_bar + 33;
     },
+    success_and_next(arg){
+      this.register.id = arg.id
+      this.register.password = arg.password
+      this.register.email = arg.email
+      this.success()
+    },
+    post_and_next(arg) {
+      this.register.name = arg.name
+      this.register.identification = arg.identification
+      this.register.birth = arg.birth
+      const url = "http://127.0.0.1:8081/register/register"
+      let obj = this.register;
+      this.axios.post(url, obj)
+        .then(response => {
+          if (response.data.status === "OK") {
+            console.log("response")
+            this.success()
+          }
+        })
+        .catch(error => {
+          console.log(error)
+        });
+    }
   }
 };
 </script>

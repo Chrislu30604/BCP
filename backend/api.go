@@ -93,12 +93,9 @@ func handleQueryName(c *gin.Context) {
 			c.JSON(http.StatusBadRequest, gin.H{"status": "Email Already in use"})
 			return
 		}
-		// 6. Insert to MongoDB
-		id := insertMongoDB("user", "account", &parser)
-		if
-		log.Println(id)
-		c.JSON(http.StatusOK, gin.H{"status": "OK"})
 
+		log.Println("Query Success", parser)
+		c.JSON(http.StatusOK, gin.H{"status": "OK"})
 	} else {
 		log.Fatal("ERROR Json Key")
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -122,9 +119,25 @@ func handleRegister(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	log.Println(rawdata)
-	log.Println(parser)
-
+	// 3. Regex Check
+	regexID := regexp.MustCompile("^[a-zA-Z0-9]*$")
+	regexEmail := regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`)
+	regexName := regexp.MustCompile("^[a-zA-Z]*$")
+	regexBirth := regexp.MustCompile(`\d{2}/\d{2}/\d{4}`)
+	if regexID.MatchString(parser.Base.ID) &&
+		regexEmail.MatchString(parser.Base.Email) &&
+		regexName.MatchString(parser.Detail.Name) &&
+		regexBirth.MatchString(parser.Detail.Birth) &&
+		len(parser.Base.Password) >= 6 {
+		log.Println("Insert in MongoDB")
+		res := insertMongoDB("user", "account", &parser)
+		if res != true {
+			log.Println("Insert Fail")
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Insert Fail"})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{"status": "OK"})
+	}
 }
 
 func findMongoDB(databaseName string, collectionName string, queryKey string, data string) bool {
@@ -151,12 +164,13 @@ func findMongoDB(databaseName string, collectionName string, queryKey string, da
 	return true
 }
 
-func insertMongoDB(databaseName string, collectionName string, data interface{}) {
+func insertMongoDB(databaseName string, collectionName string, data interface{}) bool {
 	// Connect to mongodb
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:27017"))
 	if err != nil {
 		log.Fatal("Error connect to Mongodb", err)
+		return false
 	}
 	defer cancel()
 	// Insert Bson to mongodb
@@ -164,6 +178,8 @@ func insertMongoDB(databaseName string, collectionName string, data interface{})
 	res, err := collection.InsertOne(context.Background(), data)
 	if err != nil {
 		log.Println("Error Insert", err)
+		return false
 	}
-	return res.InsertedID
+	log.Println("ObjectID: ", res.InsertedID)
+	return true
 }

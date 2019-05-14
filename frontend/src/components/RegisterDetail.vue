@@ -50,7 +50,7 @@ export default {
     return {
       register: {
         name: "",
-        indentification: "",
+        identification: "",
         birth: ""
       }
     };
@@ -59,18 +59,8 @@ export default {
     submit() {
       this.$validator.validateAll().then(valid => {
         if(valid) {
-            console.log("Post all info");
-            const url = "http://127.0.0.1:8081/register/register";
-            let obj = this.register;
-            this.axios
-            .post(url, JSON.stringify(obj))
-            .then(response => {
-                console.log(response.data);
-                this.$emit('triggerSuccess')
-            })
-            .catch(error => {
-                console.log(error);
-            });
+          let obj = this.register;
+          this.$emit('triggerSuccess', obj)
         }
       });
     }

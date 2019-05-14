@@ -64,15 +64,11 @@ export default {
           const url = "http://127.0.0.1:8081/register/queryName";
           let obj = this.register;
           this.axios
-            .post(url, {
-              id: obj.id,
-              password: obj.password,
-              email: obj.email
-            })
+            .post(url, obj)
             .then(response => {
               if (response.data.status === "OK") {
                 console.log("You can continue");
-                this.$emit('triggerSuccess')
+                this.$emit('triggerSuccess', obj)
               }
             })
             .catch(error => {
