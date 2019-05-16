@@ -31,6 +31,7 @@
                   label="Email"
                   type="email"
                   color="cyan"
+                  required
                 ></v-text-field>
                 <v-text-field
                   v-model="user.dollars"
@@ -41,6 +42,7 @@
                   label="Estimated point"
                   type="text"
                   color="cyan"
+                  required
                 ></v-text-field>
                 <v-menu
                   v-model="menu"
@@ -61,6 +63,7 @@
                       readonly
                       v-on="on"
                       color="cyan"
+                      required
                     ></v-text-field>
                   </template>
                   <v-date-picker v-model="user.date" @input="menu = false" :min="today"></v-date-picker>
@@ -73,6 +76,7 @@
                   flat
                   v-model="user.description"
                   color="cyan"
+                  required
                 ></v-textarea>
                 <upload-btn
                   @file-update="update"
@@ -83,26 +87,6 @@
                     <v-icon left dark>cloud_upload</v-icon>
                   </template>
                 </upload-btn>
-                <!--
-                <v-btn
-                  v-on:click="upload"
-                  block="block"
-                  color="blue-grey"
-                  class="white--text"
-                  type="submit"
-                  style="width:180px"
-                >
-                   Upload Image
-                  <v-icon right dark>cloud_upload</v-icon>
-                </v-btn>
-                <input
-                  type="file"
-                  id="upload"
-                  ref="upload"
-                  @change="changeImg"
-                  accept=".jpg, .jpeg, .png"
-                >
-                -->
                 <v-btn
                   @click.prevent
                   block="block"
