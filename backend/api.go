@@ -20,10 +20,10 @@ var client *mongo.Client
 type User struct {
 	Name        string `json:"name"`
 	Email       string `json:"email"`
-	Password    string `json:"password"`
 	Dollars     string `json:"dollars"`
 	Enddate     string `json:"enddate"`
 	Description string `json:"description"`
+	File        string `json:"file"`
 }
 
 type Register struct {
@@ -52,6 +52,8 @@ func handlePropose(c *gin.Context) {
 	if err != nil {
 		panic(err)
 	}
+	file, err := c.FormFile("file")
+	log.Println(file)
 	log.Println(string(rawdata))
 	json.Unmarshal(rawdata, &parser)
 

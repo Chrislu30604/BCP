@@ -123,7 +123,8 @@ export default {
         email: "",
         dollars: "",
         enddate: new Date().toISOString().substr(0, 10),
-        description: ""
+        description: "",
+        file: null,
       },
       options: {},
       menu: false,
@@ -141,14 +142,15 @@ export default {
           // ajax
           const url = "http://127.0.0.1:8081/launch/propose";
           let obj = this.user;
+          console.log(obj.file)
           this.axios
             .post(url, {
               name: obj.name,
               email: obj.email,
-              password: obj.password,
               dollars: obj.dollars,
               enddate: obj.enddate,
-              description: obj.description
+              description: obj.description,
+              file: obj.file,
             })
             .then(function(response) {
               console.log(response);
@@ -160,7 +162,7 @@ export default {
       });
     },
     update(file) {
-      console.log(file)
+      this.user.file = file
     },
   }
 };
