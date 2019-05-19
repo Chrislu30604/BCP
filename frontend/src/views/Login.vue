@@ -6,16 +6,33 @@
         <h2>Sign in with your</h2>
         <h1>BCP ID</h1>
         <v-form style="margin-bottom:30px;width:300px;">
-          <v-text-field prepend-icon="person" name="login" label="Login" type="text"></v-text-field>
           <v-text-field
+            v-model="user.id"
+            v-validate="'required|alpha_num|'"
+            data-vv-name="id"
+            :error-messages="errors.collect('id')"
+            prepend-icon="person"
+            name="id"
+            label="id"
+            type="text"
+            color="cyan"
+            required
+            ></v-text-field>
+          <v-text-field
+            v-model="user.password"
+            v-validate="'required|min:6'"
+            data-vv-name="password"
+            :error-messages="errors.collect('password')"
             prepend-icon="lock"
             name="password"
             label="Password"
             id="password"
             type="password"
+            color="cyan"
+            required
           ></v-text-field>
         </v-form>
-        <v-btn color="info" depressed>Sigin</v-btn>
+        <v-btn color="info" v-on:click="submit" depressed>Sigin</v-btn>
         <div id="createPassword">
           <a>Forgot Password?</a>
           <span>|</span>
@@ -28,7 +45,26 @@
 
 
 <script>
-export default {};
+export default {
+  data() {
+    return {
+      user: {
+        id: "",
+        password: "",
+      }
+    }
+  },
+  methods: {
+    submit() {
+      this.$validator.validateAll().then(valid => {
+        if(valid) {
+         const url = "http://127.0.0.1:8081/login" 
+        }
+      })
+    }
+  },
+
+};
 </script>
 
 

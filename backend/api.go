@@ -45,7 +45,40 @@ type Detail struct {
 }
 
 // RegisterUser define user's detail
-type RegisterUser struct {
+type QueryAuth struct {
+	ID       string `json:"id"`
+	password string `json:"password`
+}
+
+func handleLogin(c *gin.Context) {
+	parser := QueryAuth{}
+	rawdata, err := c.GetRawData()
+	if err != nil {
+		log.Println("ERROR Json Raw Data")
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	// 2.Unserialize
+	err = json.Unmarshal(rawdata, &parser)
+	if err != nil {
+		log.Println("ERROR Json Key")
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	// 3. Regex Check
+	regexID := regexp.MustCompile("^[a-zA-Z0-9]*$")
+	if regexID.MatchString(parser.ID) &&
+		len(parser.password) >= 6 {
+
+		// 4.Find Name in Mongodb
+		res := findMongoDB("user", "account", "id", parser.ID)
+		if res != true {
+			log.Println("User Not Found")
+			c.JSON(http.StatusBadRequest, gin.H{"status": "User Not Found"})
+			return
+		}
+		// 5. Check Password is true or not
+	}
 }
 
 func handlePropose(c *gin.Context) {
@@ -245,14 +278,3 @@ func insertMongoDB(databaseName string, collectionName string, data interface{})
 	log.Println("ObjectID: ", res.InsertedID)
 	return true
 }
-
-/*
-func randSeq(n int) string {
-	b := make([]rune, n)
-	for i := range b {
-		b[i] = letters[rand.Intn(len(letters))]
-	}
-	return string(b)
-}
-
-*/

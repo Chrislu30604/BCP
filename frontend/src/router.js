@@ -6,6 +6,7 @@ import Launch from './views/Launch.vue'
 import Account from './views/Account.vue'
 import Login from './views/Login.vue'
 import Register from './views/Register.vue'
+import LoginFirst from "./views/LoginFirst.vue"
 Vue.use(Router)
 
 export default new Router({
@@ -46,6 +47,11 @@ export default new Router({
       path: '/register',
       name: 'register',
       component: Register
-    }
+    },
+    {
+      path: '/loginfirst',
+      name: 'loginfirst',
+      component: LoginFirst
+    },
   ]
 })

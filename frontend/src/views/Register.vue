@@ -73,6 +73,11 @@ export default {
           if (response.data.status === "OK") {
             console.log("response")
             this.success()
+            .then(() => {
+              setTimeout(() => {
+                this.$router.push({path:'/project'})
+              }, 1000);
+            })
           }
         })
         .catch(error => {
