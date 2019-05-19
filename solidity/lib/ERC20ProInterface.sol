@@ -1,6 +1,6 @@
 pragma solidity ^0.5.0;
 
-interface ERC20LIPInterface {
+interface ERC20ProInterface {
   function totalSupply() external view returns (uint256);
   function balanceOf(address tokenOwner) external view returns (uint256 balance);
   function transfer(address to, uint256 tokens) external returns (bool success);
@@ -11,6 +11,8 @@ interface ERC20LIPInterface {
   /*-----------------Additional Function-----------------*/
   function distributePoints(address to, uint tokens) external returns (bool success);
   function transferFromContract(address from, address to, uint tokens) external returns (bool success);
+  function donate(address from , address to , uint256 tokens) external returns (bool success);
+    
   
   event Transfer(
     address indexed from,

@@ -1,10 +1,10 @@
 pragma solidity ^0.5.0;
- 
+
 import "./lib/SafeMath.sol";
 import "./lib/Ownership.sol";
-import './lib/ERC20LIPInterface.sol';
+import "./lib/ERC20ProInterface.sol";
 
-contract LIPPoints is ERC20LIPInterface, Ownership {
+contract BCPPoints is ERC20ProInterface, Ownership {
     using SafeMath for uint;
  
     string public symbol;
@@ -14,20 +14,25 @@ contract LIPPoints is ERC20LIPInterface, Ownership {
     mapping(address => uint) balances;
     mapping(address => mapping(address => uint)) allowed;
     
+    uint exchangeRate; // 1 LIP -> 2 BCP
+    
+    
     // Constructor Initiate
     constructor() public payable {
-        symbol = "LIP";
-        name = "LinePoints";
+        symbol = "BCP";
+        name = "Blockchain Charity Points";
         decimals = 18;
-        _totalSupply = 1000 * 10**uint(decimals);
-        
+        _totalSupply = 2000 * 10**uint(decimals);
+        exchangeRate = 2;
+
         // Release all the token to contract address
         balances[address(this)] = _totalSupply;
+        balances[msg.sender] = _totalSupply;
         emit Transfer(address(0), address(this), _totalSupply);
     }
     
     function totalSupply() public view returns (uint) {
-        return _totalSupply.sub(balances[address(0)]);
+        return _totalSupply;
     }
     
     function balanceOf(address tokenOwner) public view returns (uint balance) {
@@ -65,17 +70,15 @@ contract LIPPoints is ERC20LIPInterface, Ownership {
         emit Transfer(from, to, tokens);
         return true;
     }
-    
-    
+
     /*-----------------Additional Function-----------------*/
     function distributePoints(address to, uint tokens) public onlyOwner returns (bool success) {
-        require(balances[address(this)] > tokens);
+        require(balances[address(this)] >= tokens);
         require(tokens > 0);
         
         balances[address(this)] = balances[address(this)].sub(tokens);
         balances[to] = balances[to].add(tokens);
-        emit Transfer(address(this), to, tokens);
-        return true;   
+        return true;
     }
     
     function transferFromContract(address from, address to, uint tokens) public returns (bool success) {
@@ -89,7 +92,33 @@ contract LIPPoints is ERC20LIPInterface, Ownership {
     }
     
     
-    // Fallback Function
+    function LIPtoBCP(address LIPAddr, uint LIPtokens) public returns (bool success) {
+        require(ERC20ProInterface(LIPAddr).balanceOf(msg.sender) >= LIPtokens);
+        require(balances[address(this)] >= LIPtokens*exchangeRate);
+        
+        // Receive LIP from msg.sender
+        ERC20ProInterface(LIPAddr).transferFromContract(msg.sender, address(this), LIPtokens);
+        // Exchange BCP from BCPContract to msg.sender
+        transferFromContract(address(this), msg.sender, LIPtokens*exchangeRate);
+        return true;
+    }
+    
+    
+    function BCPtoLIP(address LIPAddr, uint BCPtokens) public returns (bool success) {
+        require(BCPtokens % exchangeRate == 0);
+        require(balances[msg.sender] >= BCPtokens);
+        require(ERC20ProInterface(LIPAddr).balanceOf(address(this)) >= BCPtokens.div(exchangeRate));
+    
+        // Exchange LIP from BCPContract to msg.sender
+        ERC20ProInterface(LIPAddr).transferFromContract(address(this), msg.sender, BCPtokens.div(exchangeRate));
+        // Receive BCP from msg.sender
+        transferFromContract(msg.sender, address(this), BCPtokens);
+        return true;
+    }
+    
+
+    
+    // Fallback Function 
     function () external payable {
         revert();
     }

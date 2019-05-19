@@ -1,18 +1,12 @@
 pragma solidity ^0.5.0;
 
 import "./lib/SafeMath.sol";
-import "./lib/ERC20LIPInterface.sol";
-import "./lib/ERC20BCPInterface.sol";
-import "./Escrow.sol";
+import "./lib/Escrow.sol";
+import "./lib/ERC20ProInterface.sol";
 
 
 contract CharityPlatform{
-    
     using SafeMath for uint;
-    
-    // ERC20 contract
-    address BCPAddr = 0x1614BF3D2107Aa755430202d101e9c50485805BE;
-    address LIPAddr = 0xa811361389625aE7a2205EC0E92DD542F1feCd8a;
     
     uint internal missionIndex;
     uint internal exchangeRate;
@@ -66,14 +60,14 @@ contract CharityPlatform{
     
 
     // Donate Mission 
-    function donateMission(uint _missionID, uint tokens) public returns (bool success) {
+    function donateMission(address BCPAddr, uint _missionID, uint tokens) public returns (bool success) {
         require(missionIdxList[_missionID] != msg.sender);
         require(missonList[missionIdxList[_missionID]].targetFund - missonList[missionIdxList[_missionID]].fundedAmount >= tokens);
         
         // Donation
-        require(ERC20BCPInterface(BCPAddr).balanceOf(msg.sender) >= tokens);  // Donator's BCP >= tokens
+        require(ERC20ProInterface(BCPAddr).balanceOf(msg.sender) >= tokens);  // Donator's BCP >= tokens
         // Transfer BCP from Donator to MissionContractAddress
-        ERC20BCPInterface(BCPAddr).transferFromContract(msg.sender, escrowMissionList[_missionID], tokens); 
+        ERC20ProInterface(BCPAddr).transferFromContract(msg.sender, escrowMissionList[_missionID], tokens); 
         
         missonList[missionIdxList[_missionID]].ledger[msg.sender] = tokens;
         missonList[missionIdxList[_missionID]].fundedAmount = missonList[missionIdxList[_missionID]].fundedAmount.add(tokens);   
@@ -81,21 +75,20 @@ contract CharityPlatform{
     }
 
 
-    // Mission Closing : Exchange from BCP in Escrow to LIP back to missionOwner
-    function closeMission() public view returns (address, uint) {
+    function closeMission(address BCPAddr, address LIPAddr) public returns (bool success) {
         require(missionIdxList[ownerToMissionId[msg.sender]] == msg.sender); // only missionOwner can close mission
         
         address escrowAddr = escrowMissionList[ownerToMissionId[msg.sender]];
-        uint escrowTotalBCP = ERC20BCPInterface(BCPAddr).balanceOf(escrowAddr);
+        uint escrowTotalBCP = ERC20ProInterface(BCPAddr).balanceOf(escrowAddr);
+        ERC20ProInterface(BCPAddr).transferFromContract(escrowAddr, BCPAddr, escrowTotalBCP); 
         
-        
-        // Sendback BCP to BCP.ContractAddress from missionOwner
-        // ERC20BCPInterface(BCPAddr).transferFromContract(escrowMissionList[ownerToMissionId[msg.sender]], BCPAddr, escrowTotalBCP);
-        
-        // // Exchage to LIP from BCP.ContractAddress to missionOwner
-        // require(ERC20LIPInterface(LIPAddr).balanceOf(BCPAddr) >= escrowTotalBCP.div(exchangeRate)); // require BCP have enough LIP to exchange
-        // ERC20LIPInterface(LIPAddr).transferFromContract(BCPAddr, msg.sender, escrowTotalBCP.div(exchangeRate));  
-        return (escrowAddr, escrowTotalBCP);
+       // missonList[missionIdxList[_missionID]].ledger[msg.sender] = tokens;
+        missonList[msg.sender].fundedAmount = missonList[msg.sender].fundedAmount.sub(escrowTotalBCP); 
+        // Exchage to LIP from BCP.ContractAddress to missionOwner
+        require(ERC20ProInterface(LIPAddr).balanceOf(BCPAddr) >= escrowTotalBCP.div(exchangeRate)); // require BCP have enough LIP to exchange
+        ERC20ProInterface(LIPAddr).transferFromContract(BCPAddr, msg.sender, escrowTotalBCP.div(exchangeRate)); 
+        missonList[msg.sender].fundedAmount = missonList[msg.sender].fundedAmount.sub(0); 
+        return true;
     }
 
 
