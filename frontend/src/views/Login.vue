@@ -58,7 +58,12 @@ export default {
     submit() {
       this.$validator.validateAll().then(valid => {
         if(valid) {
-         const url = "http://127.0.0.1:8081/login" 
+         const url = "http://127.0.0.1:8081/login"
+         let obj = this.user
+         this.axios.get(url, obj)
+         .then((response) => {
+           console.log(response)
+         }) 
         }
       })
     }

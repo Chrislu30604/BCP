@@ -7,7 +7,6 @@ import pollWeb3 from '../web3/pollWeb3'
 import getExchangeContract from '../web3/getExchangeContract'
 
 Vue.use(Vuex)
-s
 export const store = new Vuex.Store({
   strict: true,
   state,
@@ -19,7 +18,7 @@ export const store = new Vuex.Store({
       web3_state.coinbase = result.coinbase
       web3_state.networkId = result.networkId
       web3_state.balance = parseInt(result.balance, 10)
-      web3_state.isInjected = result.isInjected
+      web3_state.isInjected = result.injectedWeb3
       web3_state.web3Instance = result.web3
       state.web3 = web3_state
       //  this.store.dispatch('pollWeb3')

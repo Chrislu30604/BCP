@@ -84,33 +84,32 @@ export default {
     return {
       user: {
         linepoint: 40,
-        bcppoint: 3000,
+        bcppoint: null,
         ex_linepoint: 0
       }
     };
   },
 
-  beforeMount() {
-          console.log("submit exchange");
-          this.$store.dispatch("getExchangeContractInstance");
-  },
-  methods: {
-    getBalance() {
-      this.$validator.validateAll().then(valid => {
-        if (valid) {
-      console.log("Get Balance")
-      this.$store.state.contractInstance().balanceOf(this.$store.state.web3.coinbase, {
+  async beforeMount() {
+    console.log("submit exchange");
+    await this.$store.dispatch("getExchangeContractInstance");
+    console.log("Get Balance")
+    await this.$store.state.contractInstance().balanceOf(this.$store.state.web3.coinbase, {
         gas: 3000000,
         from: this.$store.state.web3.coinbase
       }, (err, result) => {
         if (err) {
           console.log(err)
-          this.pending = false
         } else {
-          console.log("Balance:", result.c[0])
+          this.user.bcppoint = result.c[0]
         }
-      })
-
+    })
+  },
+  methods: {
+    getBalance() {
+      this.$validator.validateAll().then(valid => {
+        if (valid) {
+          console.log("submit")
         }
       });
     }
