@@ -7,7 +7,7 @@ import pollWeb3 from '../web3/pollWeb3'
 import getExchangeContract from '../web3/getExchangeContract'
 
 Vue.use(Vuex)
-
+s
 export const store = new Vuex.Store({
   strict: true,
   state,
