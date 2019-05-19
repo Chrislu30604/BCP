@@ -14,6 +14,16 @@
               <v-form>
                 <v-text-field
                   v-validate="'required|max:20'"
+                  data-vv-name="title"
+                  :error-messages="errors.collect('title')"
+                  v-model="user.title"
+                  prepend-icon="subtitles"
+                  label="Enter the Project Title"
+                  color="cyan"
+                  required
+                ></v-text-field>
+                <v-text-field
+                  v-validate="'required|max:20'"
                   data-vv-name="name"
                   :error-messages="errors.collect('name')"
                   v-model="user.name"
@@ -119,12 +129,14 @@ export default {
   data() {
     return {
       user: {
+        title: "",
         name: "",
         email: "",
         dollars: "",
         enddate: new Date().toISOString().substr(0, 10),
         description: "",
         file: null,
+        url: "",
       },
       options: {},
       menu: false,
@@ -139,24 +151,48 @@ export default {
     submit() {
       this.$validator.validateAll().then(async (valid) => {
         if (valid) {
-          // ajax
+          let form = new FormData()
+          form.append('image', this.user.file)
+          // 1. Post image to IMGUR
+          const imgURL =  "https://api.imgur.com/3/image"
+          const clientID = "8c2fff697c335bc"
+          let config = {
+            headers: {
+              'Authorization': 'Client-ID ' + clientID,
+          }}
+          await this.axios.post(imgURL, 
+            form,
+            config
+          )
+          .then((response) => {
+            console.log(response.data.data.link)
+            this.user.url = response.data.data.link
+          })
+          .catch((error) => {
+            console.log(error)
+          })
+
+          // 2. Post Information to Backend
+
           const url = "http://127.0.0.1:8081/launch/propose";
-          const config = { headers: {
+          const obj = this.user
+          let configs = { headers: {
             'accept': 'application/json',
             'Accept-Language': 'en-US,en;q=0.8',
             'Content-Type': 'multipart/form-data'}};
-          let obj = this.user;
-          let form = new FormData()
-          form.append("name", obj.name)
-          form.append("email", obj.email)
-          form.append("dollars", obj.dollars)
-          form.append("enddate", obj.enddate)
-          form.append("description", obj.description)
-          form.append("file", obj.file)
-          await this.axios
+          let Postform = new FormData()
+          Postform.append("title", obj.title)
+          Postform.append("name", obj.name)
+          Postform.append("email", obj.email)
+          Postform.append("dollars", obj.dollars)
+          Postform.append("enddate", obj.enddate)
+          Postform.append("description", obj.description)
+          Postform.append("url", obj.url)
+
+          this.axios
             .post(url,
-                  form,
-                  config)
+                  Postform,
+                  configs)
             .then((response) => {
               console.log(response)
             })

@@ -3,11 +3,8 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"io"
 	"log"
-	"math/rand"
 	"net/http"
-	"os"
 	"regexp"
 	"time"
 
@@ -22,12 +19,13 @@ var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
 // User defined the launch project content
 type Propose struct {
+	Title       string `json:"title"`
 	Name        string `json:"name"`
 	Email       string `json:"email"`
 	Dollars     string `json:"dollars"`
 	Enddate     string `json:"enddate"`
 	Description string `json:"description"`
-	FileName    string `json:"fileName"`
+	Url         string `json:"url"`
 }
 
 type Register struct {
@@ -51,33 +49,35 @@ type RegisterUser struct {
 }
 
 func handlePropose(c *gin.Context) {
-	// 1. Create img Folder
-	file, header, err := c.Request.FormFile("file")
-	if err != nil {
-		log.Println("Error File")
-		return
-	}
-	rand.Seed(time.Now().UnixNano())
-	filename := randSeq(10) + "_" + header.Filename
-	out, err := os.Create("./tmp/" + filename)
-	if err != nil {
-		log.Println("Create Fail ", err)
-		return
-	}
-	defer out.Close()
-	_, err = io.Copy(out, file)
-	if err != nil {
-		log.Fatal(err)
-	}
-
+	/*
+		// 1. Create img Folder
+		file, header, err := c.Request.FormFile("file")
+		if err != nil {
+			log.Println("Error File")
+			return
+		}
+		rand.Seed(time.Now().UnixNano())
+		filename := randSeq(10) + "_" + header.Filename
+		out, err := os.Create("./tmp/" + filename)
+		if err != nil {
+			log.Println("Create Fail ", err)
+			return
+		}
+		defer out.Close()
+		_, err = io.Copy(out, file)
+		if err != nil {
+			log.Fatal(err)
+		}
+	*/
 	// 2. Parser the purpose info
 	parser := Propose{}
+	parser.Title = c.PostForm("title")
 	parser.Name = c.PostForm("name")
 	parser.Email = c.PostForm("email")
 	parser.Enddate = c.PostForm("enddate")
 	parser.Dollars = c.PostForm("dollars")
 	parser.Description = c.PostForm("description")
-	parser.FileName = filename
+	parser.Url = c.PostForm("url")
 	log.Println(parser)
 
 	// 3. Regex Check
@@ -112,10 +112,11 @@ func handleGetPropose(c *gin.Context) {
 	cur, err := collection.Find(context.Background(), bson.D{})
 	num, err := collection.CountDocuments(context.Background(), bson.D{})
 	defer cur.Close(ctx)
-	// If find, return false
+	// 	If find, return false
 	parserAll := make([]Propose, num)
 	cur.All(ctx, &parserAll)
 	log.Println(parserAll)
+
 	c.JSON(http.StatusOK, parserAll)
 }
 
@@ -245,6 +246,7 @@ func insertMongoDB(databaseName string, collectionName string, data interface{})
 	return true
 }
 
+/*
 func randSeq(n int) string {
 	b := make([]rune, n)
 	for i := range b {
@@ -252,3 +254,5 @@ func randSeq(n int) string {
 	}
 	return string(b)
 }
+
+*/
