@@ -1,4 +1,4 @@
-const address = "0xE9a8A453b864Fcd1255aadF8941C9791A5d668CA"
+const address = "0x74424C5fB64f65F25a8cCfDE6012550D8DaD17fF"
 const ABI = [
     {
       "constant": true,
@@ -395,35 +395,10 @@ const ABI = [
       "stateMutability": "nonpayable",
       "type": "function",
       "signature": "0xa8940273"
-    },
-    {
-      "constant": false,
-      "inputs": [
-        {
-          "name": "from",
-          "type": "address"
-        },
-        {
-          "name": "to",
-          "type": "address"
-        },
-        {
-          "name": "tokens",
-          "type": "uint256"
-        }
-      ],
-      "name": "donate",
-      "outputs": [
-        {
-          "name": "success",
-          "type": "bool"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "nonpayable",
-      "type": "function",
-      "signature": "0x386bc05a"
-    }
+    } 
   ]
 
-export {address, ABI}
+export {
+  address,
+  ABI
+}

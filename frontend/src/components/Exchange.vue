@@ -88,7 +88,7 @@ export default {
   data() {
     return {
       user: {
-        linepoint: 40,
+        linepoint: null,
         bcppoint: null,
         ex_linepoint: 0
       },
@@ -98,22 +98,38 @@ export default {
 
   async beforeMount() {
     console.log("submit exchange");
-    await this.$store.dispatch("getExchangeContractInstance");
-    console.log("Get Balance");
-    await this.$store.state.contractInstance().balanceOf(
-      this.$store.state.web3.coinbase,
-      {
-        gas: 3000000,
-        from: this.$store.state.web3.coinbase
-      },
-      (err, result) => {
-        if (err) {
-          console.log(err);
-        } else {
-          this.user.bcppoint = result.c[0];
+    await this.$store.dispatch("getBCPContractInstance");
+    await this.$store.dispatch("getLIPContractInstance")
+    setTimeout(() => {
+      this.$store.state.BCPContractInstance().balanceOf(
+        this.$store.state.web3.coinbase,
+        {
+          gas: 3000000,
+          from: this.$store.state.web3.coinbase
+        },
+        (err, result) => {
+          if (err) {
+            console.log(err);
+          } else {
+            this.user.bcppoint = result.c[0];
+          }
         }
-      }
-    );
+      );
+      this.$store.state.LIPContractInstance().balanceOf(
+        this.$store.state.web3.coinbase,
+        {
+          gas: 3000000,
+          from: this.$store.state.web3.coinbase
+        },
+        (err, result) => {
+          if (err) {
+            console.log(err);
+          } else {
+            this.user.linepoint = result.c[0];
+          }
+        }
+      );
+    }, 500);
   },
   methods: {
     getBalance() {
@@ -121,6 +137,7 @@ export default {
         if (valid) {
           console.log("submit");
           this.isSubmit = true
+          console.log("Get Balance");
         }
       });
     }

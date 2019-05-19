@@ -11,7 +11,6 @@ interface ERC20ProInterface {
   /*-----------------Additional Function-----------------*/
   function distributePoints(address to, uint tokens) external returns (bool success);
   function transferFromContract(address from, address to, uint tokens) external returns (bool success);
-  function donate(address from , address to , uint256 tokens) external returns (bool success);
     
   
   event Transfer(

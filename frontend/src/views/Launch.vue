@@ -143,14 +143,44 @@ export default {
       today: new Date().toISOString().substr(0, 10)
     };
   },
+
+  async beforeMount() {
+    await this.$store.dispatch('registerWeb3') 
+    await this.$store.dispatch("getPlatformContractInstance");
+  },
+
   components: {
     'upload-btn': UploadButton
   },
 
   methods: {
+    submitToSmartContract() {
+      this.$store.state.PlatformContractInstance().addMission(
+        "HI",
+        "HI description",
+        "https",
+        "https",
+        1000,
+        {
+          gas: 3000000,
+          from: this.$store.state.web3.coinbase
+        },
+        (err, result) => {
+          if (err) {
+            console.log(err);
+          } else {
+            console.log(result)
+          }
+        }
+      );
+      // value: this.$store.state.web3.web3Instance().toWei(0.00001, 'ether'),
+    },
+
     submit() {
       this.$validator.validateAll().then(async (valid) => {
         if (valid) {
+
+          /*   Send to Backend */
           let form = new FormData()
           form.append('image', this.user.file)
           // 1. Post image to IMGUR
@@ -189,7 +219,7 @@ export default {
           Postform.append("description", obj.description)
           Postform.append("url", obj.url)
 
-          this.axios
+          await this.axios
             .post(url,
                   Postform,
                   configs)
@@ -199,6 +229,9 @@ export default {
             .catch((error) => {
               console.log(error)
             })
+
+          /* Send to Smart Contract */
+          this.submitToSmartContract(obj);
         }
       });
     },

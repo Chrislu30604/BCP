@@ -1,8 +1,8 @@
 pragma solidity ^0.5.0;
 
 import "./lib/SafeMath.sol";
-import "./lib/Escrow.sol";
 import "./lib/ERC20ProInterface.sol";
+import "./Escrow.sol";
 
 
 contract CharityPlatform{
