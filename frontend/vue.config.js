@@ -1,4 +1,4 @@
-
+/*
 module.exports = {
   configureWebpack: {
     // other webpack options to merge in ...
@@ -10,4 +10,4 @@ module.exports = {
     disableHostCheck: true,
   },
 };
-
+*/

@@ -29,6 +29,7 @@ func main() {
 	launch := router.Group("/launch")
 	{
 		launch.POST("/propose", handlePropose)
+		launch.GET("/propose", handleGetPropose)
 	}
 	reg := router.Group("/register")
 	{

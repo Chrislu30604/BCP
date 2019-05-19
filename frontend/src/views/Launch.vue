@@ -137,27 +137,32 @@ export default {
 
   methods: {
     submit() {
-      this.$validator.validateAll().then(result => {
-        if (result) {
+      this.$validator.validateAll().then(async (valid) => {
+        if (valid) {
           // ajax
           const url = "http://127.0.0.1:8081/launch/propose";
+          const config = { headers: {
+            'accept': 'application/json',
+            'Accept-Language': 'en-US,en;q=0.8',
+            'Content-Type': 'multipart/form-data'}};
           let obj = this.user;
-          console.log(obj.file)
-          this.axios
-            .post(url, {
-              name: obj.name,
-              email: obj.email,
-              dollars: obj.dollars,
-              enddate: obj.enddate,
-              description: obj.description,
-              file: obj.file,
+          let form = new FormData()
+          form.append("name", obj.name)
+          form.append("email", obj.email)
+          form.append("dollars", obj.dollars)
+          form.append("enddate", obj.enddate)
+          form.append("description", obj.description)
+          form.append("file", obj.file)
+          await this.axios
+            .post(url,
+                  form,
+                  config)
+            .then((response) => {
+              console.log(response)
             })
-            .then(function(response) {
-              console.log(response);
+            .catch((error) => {
+              console.log(error)
             })
-            .catch(function(error) {
-              console.log(error);
-            });
         }
       });
     },

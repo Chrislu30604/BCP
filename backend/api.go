@@ -3,8 +3,11 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"io"
 	"log"
+	"math/rand"
 	"net/http"
+	"os"
 	"regexp"
 	"time"
 
@@ -15,15 +18,16 @@ import (
 )
 
 var client *mongo.Client
+var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
 // User defined the launch project content
-type User struct {
+type Propose struct {
 	Name        string `json:"name"`
 	Email       string `json:"email"`
 	Dollars     string `json:"dollars"`
 	Enddate     string `json:"enddate"`
 	Description string `json:"description"`
-	File        string `json:"file"`
+	FileName    string `json:"fileName"`
 }
 
 type Register struct {
@@ -47,17 +51,72 @@ type RegisterUser struct {
 }
 
 func handlePropose(c *gin.Context) {
-	parser := User{}
-	rawdata, err := c.GetRawData()
+	// 1. Create img Folder
+	file, header, err := c.Request.FormFile("file")
 	if err != nil {
-		panic(err)
+		log.Println("Error File")
+		return
 	}
-	file, err := c.FormFile("file")
-	log.Println(file)
-	log.Println(string(rawdata))
-	json.Unmarshal(rawdata, &parser)
+	rand.Seed(time.Now().UnixNano())
+	filename := randSeq(10) + "_" + header.Filename
+	out, err := os.Create("./tmp/" + filename)
+	if err != nil {
+		log.Println("Create Fail ", err)
+		return
+	}
+	defer out.Close()
+	_, err = io.Copy(out, file)
+	if err != nil {
+		log.Fatal(err)
+	}
 
+	// 2. Parser the purpose info
+	parser := Propose{}
+	parser.Name = c.PostForm("name")
+	parser.Email = c.PostForm("email")
+	parser.Enddate = c.PostForm("enddate")
+	parser.Dollars = c.PostForm("dollars")
+	parser.Description = c.PostForm("description")
+	parser.FileName = filename
 	log.Println(parser)
+
+	// 3. Regex Check
+	regexEmail := regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`)
+	regexDollars := regexp.MustCompile(`^[0-9]*$`)
+	if regexEmail.MatchString(parser.Email) &&
+		regexDollars.MatchString(parser.Dollars) {
+		// 4. Insert To DB
+		log.Println("Insert in MongoDB")
+		res := insertMongoDB("user", "propose", &parser)
+		if res != true {
+			log.Println("Insert Fail")
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Insert Fail"})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{"status": "OK"})
+	}
+}
+
+func handleGetPropose(c *gin.Context) {
+	const databaseName = "user"
+	const collectionName = "propose"
+	// Connect to mongodb
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:27017"))
+	if err != nil {
+		log.Fatal("Error connect to Mongodb", err)
+	}
+	defer cancel()
+	// Query Name
+	collection := client.Database(databaseName).Collection(collectionName)
+	cur, err := collection.Find(context.Background(), bson.D{})
+	num, err := collection.CountDocuments(context.Background(), bson.D{})
+	defer cur.Close(ctx)
+	// If find, return false
+	parserAll := make([]Propose, num)
+	cur.All(ctx, &parserAll)
+	log.Println(parserAll)
+	c.JSON(http.StatusOK, parserAll)
 }
 
 func handleQueryName(c *gin.Context) {
@@ -184,4 +243,12 @@ func insertMongoDB(databaseName string, collectionName string, data interface{})
 	}
 	log.Println("ObjectID: ", res.InsertedID)
 	return true
+}
+
+func randSeq(n int) string {
+	b := make([]rune, n)
+	for i := range b {
+		b[i] = letters[rand.Intn(len(letters))]
+	}
+	return string(b)
 }

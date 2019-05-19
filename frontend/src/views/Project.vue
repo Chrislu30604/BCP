@@ -35,6 +35,14 @@ export default {
   data() {
     return {};
   },
+  beforeMount() {
+    const url = "http://127.0.0.1:8081/launch/propose";
+    this.axios.get(
+      url      
+    ).then((response) => {
+      console.log(response)
+    })
+  },
 
   methods: {}
 };

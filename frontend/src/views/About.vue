@@ -6,10 +6,22 @@
     </div>
     <div id="about-pic">
       <div id="about-wrap">
-        <dm-list-item icon="cloud" icon-size="50px" icon-color="#e1f5fe">Decentralized Tech</dm-list-item>
-        <dm-list-item icon="show_chart" icon-size="50px" icon-color="#e1f5fe">Trace History</dm-list-item>
-        <dm-list-item icon="public" icon-size="50px" icon-color="#e1f5fe">Donation from all over the world</dm-list-item>
-        <dm-list-item icon="cancel" icon-size="50px" icon-color="#e1f5fe">No fake transaction</dm-list-item>
+        <div class=about-obj>
+          <v-icon size="48" color="cyan" class="icon">cloud</v-icon>  
+          <p>Decentralized Tech</p>
+        </div>
+        <div class=about-obj>
+          <v-icon size="48" color="orange" class="icon">show_chart</v-icon>  
+          <p>Trace History</p>
+        </div>
+        <div class=about-obj>
+          <v-icon size="48" color="green accent-2" class="icon">public</v-icon>  
+          <p>Donation from all over the world</p>
+        </div>
+        <div class=about-obj>
+          <v-icon size="48" color="blue accent-1" class="icon">cancel</v-icon>  
+          <p>No Fake Transaction</p>
+        </div>
       </div>
     </div>
   </div>
@@ -55,14 +67,18 @@ $main-color: #00b285;
   justify-content: center;
   align-items: flex-start;
 
-  .dm-base-list-item .dm-base-list-item__container .dm-base-list-item__circle {
-    width: 80px !important;
-    height: 80px !important;
-    border-width: 6px !important;
-    margin-bottom: 12px !important;
-  }
 
   #about-wrap {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    .about-obj {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 10px;
+    }
     margin-left: 100px;
     > div:nth-child(2) {
       margin-left: 30px;
@@ -74,10 +90,18 @@ $main-color: #00b285;
       margin-left: 90px;
     }
 
-    p {
-      font-size: 24px !important;
+    .icon {
+      border: 3px solid;
+      border-radius: 50%;
+      padding: 6px;
     }
 
+
+    p {
+      font-size: 32px;
+      margin: 0 auto;
+      margin-left: 10px;
+    }
   }
 }
 </style>
