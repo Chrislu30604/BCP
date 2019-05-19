@@ -71,7 +71,7 @@
       ></v-text-field>
     </div>
     <div id="btn_submit">
-      <v-btn @click="submit_exchange" color="warning">Submit</v-btn>
+      <v-btn @click="getBalance" color="warning">Submit</v-btn>
     </div>
   </div>
 </template>
@@ -89,12 +89,28 @@ export default {
       }
     };
   },
-  methods: {
-    submit_exchange() {
-      this.$validator.validateAll().then(valid => {
-        if (valid) {
+
+  beforeMount() {
           console.log("submit exchange");
           this.$store.dispatch("getExchangeContractInstance");
+  },
+  methods: {
+    getBalance() {
+      this.$validator.validateAll().then(valid => {
+        if (valid) {
+      console.log("Get Balance")
+      this.$store.state.contractInstance().balanceOf(this.$store.state.web3.coinbase, {
+        gas: 3000000,
+        from: this.$store.state.web3.coinbase
+      }, (err, result) => {
+        if (err) {
+          console.log(err)
+          this.pending = false
+        } else {
+          console.log("Balance:", result.c[0])
+        }
+      })
+
         }
       });
     }

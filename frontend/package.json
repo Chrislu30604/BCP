@@ -19,7 +19,7 @@
     "vuetify": "^1.5.5",
     "vuetify-upload-button": "^2.0.0",
     "vuex": "^3.0.1",
-    "web3": "^1.0.0-beta.54"
+    "web3": "^0.20.5"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.6.0",
