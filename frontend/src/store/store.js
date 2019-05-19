@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import state from './state'
-import web3Obj from '../web3/getWeb3'
+import getWeb3 from '../web3/getWeb3'
 import pollWeb3 from '../web3/pollWeb3'
 
 import getExchangeContract from '../web3/getExchangeContract'
@@ -37,7 +37,7 @@ export const store = new Vuex.Store({
   actions: {
     registerWeb3 ({commit}) {
       console.log('Register Web3 Action being executed')
-      web3Obj.initWeb3().then(result => {
+      getWeb3.then(result => {
         console.log('register web3 Instance', result)
         commit('registerWeb3Instance', result)
       }).catch(e => {
