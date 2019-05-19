@@ -1,5 +1,13 @@
 const state = {
-    isLogin: false
+    isLogin: false,
+    user: {
+        id: "",
+        password: "",
+        email: "",
+        name: "",
+        identification: "",
+        birth: "",
+    },
 }
 
 const mutations = {

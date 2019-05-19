@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import state from './state'
+import account from './account'
 import getWeb3 from '../web3/getWeb3'
 import pollWeb3 from '../web3/pollWeb3'
 
@@ -10,6 +11,7 @@ Vue.use(Vuex)
 export const store = new Vuex.Store({
   strict: true,
   state,
+  account,
   mutations: {
     registerWeb3Instance(state, payload) {
       console.log('registerWeb3Instace Mutation', payload)

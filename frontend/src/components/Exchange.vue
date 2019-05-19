@@ -1,77 +1,82 @@
 <template>
-  <div id="exchange">
-    <h2 id="currency_header">YOUR CURRENCY & ACCOUNT</h2>
-    <div id="Lcurrency">
-      <v-layout row>
-        <v-flex xs6>
-          <v-subheader>Line Point</v-subheader>
-        </v-flex>
-        <v-flex xs10>
-          <v-text-field
-            label="Amount"
-            :value="user.linepoint"
-            prefix="$"
-            color="cyan"
-            readonly
-            class="input_text"
-          ></v-text-field>
-        </v-flex>
-        <v-flex xs6>
-          <v-subheader>BCP Point</v-subheader>
-        </v-flex>
-        <v-flex xs10>
-          <v-text-field
-            label="Amount"
-            :value="user.bcppoint"
-            prefix="$"
-            readonly
-            color="cyan"
-            class="input_text"
-          ></v-text-field>
-        </v-flex>
-      </v-layout>
-    </div>
-    <div id="Bcurrency">
-      <div class="metamask-info">
-        <p v-if="isInjected" id="has-metamask">
-          <i aria-hidden="true" class="fa fa-check"></i> Metamask installed
-        </p>
-        <p v-else id="no-metamask">
-          <i aria-hidden="true" class="fa fa-times"></i> Metamask not found
-        </p>
-        <p>Network: {{ network }}</p>
-        <p>Account: {{ coinbase }}</p>
-        <p>Balance: {{ balance }} Wei</p>
+  <div style="height:100%">
+    <div v-if="!isSubmit" id="exchange">
+      <h2 id="currency_header">YOUR CURRENCY & ACCOUNT</h2>
+      <div id="Lcurrency">
+        <v-layout row>
+          <v-flex xs6>
+            <v-subheader>Line Point</v-subheader>
+          </v-flex>
+          <v-flex xs10>
+            <v-text-field
+              label="Amount"
+              :value="user.linepoint"
+              prefix="$"
+              color="cyan"
+              readonly
+              class="input_text"
+            ></v-text-field>
+          </v-flex>
+          <v-flex xs6>
+            <v-subheader>BCP Point</v-subheader>
+          </v-flex>
+          <v-flex xs10>
+            <v-text-field
+              label="Amount"
+              :value="user.bcppoint"
+              prefix="$"
+              readonly
+              color="cyan"
+              class="input_text"
+            ></v-text-field>
+          </v-flex>
+        </v-layout>
+      </div>
+      <div id="Bcurrency">
+        <div class="metamask-info">
+          <p v-if="isInjected" id="has-metamask">
+            <i aria-hidden="true" class="fa fa-check"></i> Metamask installed
+          </p>
+          <p v-else id="no-metamask">
+            <i aria-hidden="true" class="fa fa-times"></i> Metamask not found
+          </p>
+          <p>Network: {{ network }}</p>
+          <p>Account: {{ coinbase }}</p>
+          <p>Balance: {{ balance }} Wei</p>
+        </div>
+      </div>
+      <h2 id="exchange_header">EXCHANGE CURRENCY</h2>
+      <div id="linepoint">
+        <img class="point" src="../assets/line.svg">
+        <v-text-field
+          v-model="displayCurrency"
+          v-validate="'required|numeric|max_value:' + user.linepoint"
+          data-vv-name="point"
+          :error-messages="errors.collect('point')"
+          label="Line point"
+          prefix="$"
+          placeholder="enter your point"
+          color="cyan"
+          class="ex_text"
+        ></v-text-field>
+      </div>
+      <div id="bcppoint">
+        <img class="point" src="../assets/money-bag.svg">
+        <v-text-field
+          v-model="exCurrency"
+          label="BCP point"
+          prefix="$"
+          color="cyan"
+          readonly
+          class="ex_text"
+        ></v-text-field>
+      </div>
+      <div id="btn_submit">
+        <v-btn @click="getBalance" color="warning">Submit</v-btn>
       </div>
     </div>
-    <h2 id="exchange_header">EXCHANGE CURRENCY</h2>
-    <div id="linepoint">
-      <img class="point" src="../assets/line.svg">
-      <v-text-field
-        v-model="displayCurrency"
-        v-validate="'required|numeric|max_value:' + user.linepoint"
-        data-vv-name="point"
-        :error-messages="errors.collect('point')"
-        label="Line point"
-        prefix="$"
-        placeholder="enter your point"
-        color="cyan"
-        class="ex_text"
-      ></v-text-field>
-    </div>
-    <div id="bcppoint">
-      <img class="point" src="../assets/money-bag.svg">
-      <v-text-field
-        v-model="exCurrency"
-        label="BCP point"
-        prefix="$"
-        color="cyan"
-        readonly
-        class="ex_text"
-      ></v-text-field>
-    </div>
-    <div id="btn_submit">
-      <v-btn @click="getBalance" color="warning">Submit</v-btn>
+    <div v-else id="exchange_OK">
+      <h1>You are Successfully exchange point!!</h1>
     </div>
   </div>
 </template>
@@ -86,30 +91,36 @@ export default {
         linepoint: 40,
         bcppoint: null,
         ex_linepoint: 0
-      }
+      },
+      isSubmit: false,
     };
   },
 
   async beforeMount() {
     console.log("submit exchange");
     await this.$store.dispatch("getExchangeContractInstance");
-    console.log("Get Balance")
-    await this.$store.state.contractInstance().balanceOf(this.$store.state.web3.coinbase, {
+    console.log("Get Balance");
+    await this.$store.state.contractInstance().balanceOf(
+      this.$store.state.web3.coinbase,
+      {
         gas: 3000000,
         from: this.$store.state.web3.coinbase
-      }, (err, result) => {
+      },
+      (err, result) => {
         if (err) {
-          console.log(err)
+          console.log(err);
         } else {
-          this.user.bcppoint = result.c[0]
+          this.user.bcppoint = result.c[0];
         }
-    })
+      }
+    );
   },
   methods: {
     getBalance() {
       this.$validator.validateAll().then(valid => {
         if (valid) {
-          console.log("submit")
+          console.log("submit");
+          this.isSubmit = true
         }
       });
     }
@@ -121,7 +132,8 @@ export default {
       coinbase: state => state.web3.coinbase,
       balance: state => state.web3.balance,
       ethBalance: state => {
-        if(state.web3.web3Instance !== null) return state.web3.web3Instance().fromWei(state.web3.balance, 'ether')
+        if (state.web3.web3Instance !== null)
+          return state.web3.web3Instance().fromWei(state.web3.balance, "ether");
       }
     }),
 
@@ -132,18 +144,29 @@ export default {
     },
     displayCurrency: {
       get() {
-        return this.user.ex_linepoint || ''
+        return this.user.ex_linepoint || "";
       },
       set(value) {
-        this.user.ex_linepoint = value; 
-      },
-    },
-  },
+        this.user.ex_linepoint = value;
+      }
+    }
+  }
 };
 </script>
 
 
 <style lang="scss">
+#exchange_OK {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  h1 {
+    color: #5fd89c;
+    size: 28px;
+  }
+
+}
 #exchange {
   display: grid; //  10% 15% 10% 50% 15%
   grid-template-rows: 60px 90px 60px 200px auto;
@@ -211,11 +234,11 @@ export default {
     justify-content: space-around;
     align-items: flex-start;
   }
-#has-metamask {
-color: green;
-}
-#no-metamask {
-color:red
-}
+  #has-metamask {
+    color: green;
+  }
+  #no-metamask {
+    color: red;
+  }
 }
 </style>
