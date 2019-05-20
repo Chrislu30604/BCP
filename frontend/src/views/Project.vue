@@ -57,8 +57,9 @@ export default {
   methods: {
     donate(event, res) {
       console.log(res.title)
+      const BCPAddress = "0xDEcF01E2DCfDA51d64271546ee7150F956A1128B"
       this.$store.state.PlatformContractInstance().donateMission(
-        "0x46d05BAcBA343e2236041b48453980e196c9e321",
+        BCPAddress,
         1,
         100,
         {

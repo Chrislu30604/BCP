@@ -70,9 +70,11 @@ export default {
   },
   methods: {
       closeMission() {
+        const BCPAddress = "0xDEcF01E2DCfDA51d64271546ee7150F956A1128B"
+        const LIPAddress = "0x699D3BAA37c46aE9A3A83d0Cc43161651F0f7083"
         this.$store.state.PlatformContractInstance().closeMission(
-        "0x46d05BAcBA343e2236041b48453980e196c9e321",
-        "0xd5C5C64f6D62C3fb0434d4BB80E5BD11cc3fd509",
+        BCPAddress,
+        LIPAddress,
         {
             gas: 3000000,
             from: this.$store.state.web3.coinbase

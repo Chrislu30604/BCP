@@ -42,7 +42,7 @@
           </p>
           <p>Network: {{ network }}</p>
           <p>Account: {{ coinbase }}</p>
-          <p>Balance: {{ balance }} Wei</p>
+          <p>Balance: {{ ethBalance }} Wei</p>
         </div>
       </div>
       <h2 id="exchange_header">EXCHANGE CURRENCY</h2>
@@ -137,9 +137,10 @@ export default {
         if (valid) {
           console.log("submit");
           this.isSubmit = true
+          let LIPAddress = "0x699D3BAA37c46aE9A3A83d0Cc43161651F0f7083"
           console.log(this.user.ex_linepoint)
           this.$store.state.BCPContractInstance().LIPtoBCP(
-            "0x46d05BAcBA343e2236041b48453980e196c9e321",
+            LIPAddress,
             this.user.ex_linepoint,
             {
               gas: 3000000,
