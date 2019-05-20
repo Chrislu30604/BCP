@@ -72,7 +72,7 @@
         ></v-text-field>
       </div>
       <div id="btn_submit">
-        <v-btn @click="getBalance" color="warning">Submit</v-btn>
+        <v-btn @click="submit" color="warning">Submit</v-btn>
       </div>
     </div>
     <div v-else id="exchange_OK">
@@ -132,12 +132,27 @@ export default {
     }, 500);
   },
   methods: {
-    getBalance() {
+    submit() {
       this.$validator.validateAll().then(valid => {
         if (valid) {
           console.log("submit");
           this.isSubmit = true
-          console.log("Get Balance");
+          console.log(this.user.ex_linepoint)
+          this.$store.state.BCPContractInstance().LIPtoBCP(
+            "0x46d05BAcBA343e2236041b48453980e196c9e321",
+            this.user.ex_linepoint,
+            {
+              gas: 3000000,
+              from: this.$store.state.web3.coinbase
+            },
+            (err, result) => {
+              if (err) {
+                console.log(err);
+              } else {
+                console.log(result)
+              }
+            }
+          );
         }
       });
     }

@@ -7,6 +7,7 @@ import Account from './views/Account.vue'
 import Login from './views/Login.vue'
 import Register from './views/Register.vue'
 import LoginFirst from "./views/LoginFirst.vue"
+import Myproject from "./views/Myproject.vue"
 Vue.use(Router)
 
 export default new Router({
@@ -53,5 +54,10 @@ export default new Router({
       name: 'loginfirst',
       component: LoginFirst
     },
+    {
+      path: '/myproject',
+      name: 'myproject',
+      component: Myproject,
+    }
   ]
 })

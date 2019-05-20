@@ -58,7 +58,8 @@ export default {
     return {
       project: [
         { title: "Current project", von: this.routeToProject },
-        { title: "Launch project", von: this.routeToLaunch }
+        { title: "Launch project", von: this.routeToLaunch },
+        { title: "My project", von: this.routeToMyproject},
       ],
       account: [
         { title: "Login", von: this.routeToLogin },
@@ -87,6 +88,9 @@ export default {
     routeToRegister() {
       this.$router.push("/register")
     },
+    routeToMyproject() {
+      this.$router.push("/myproject")
+    }
   }
 };
 </script>

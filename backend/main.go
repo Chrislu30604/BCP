@@ -37,6 +37,11 @@ func main() {
 		reg.POST("/queryName", handleQueryName)
 		reg.POST("/register", handleRegister)
 	}
-
+	abi := router.Group("/abi")
+	{
+		abi.GET("/bcp", handleABIBCP)
+		abi.GET("/lip", handleABILIP)
+		abi.GET("/platform", handleABIPlatform)
+	}
 	router.Run(":8081")
 }
