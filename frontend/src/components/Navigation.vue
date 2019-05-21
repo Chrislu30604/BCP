@@ -23,7 +23,7 @@
     <v-toolbar app fixed clipped-left flat scroll-off-screen style="background:rgba(0,0,0,0)">
       <v-toolbar-side-icon @click.prevent="drawer = !drawer"></v-toolbar-side-icon>
       <img src="../assets/owl.svg" v-on:click="routeToHome" style="margin-left:30px;width:40px;cursor:pointer">
-      <v-toolbar-title v-on:click="routeToHome" flat>Block Charity Point</v-toolbar-title>
+      <v-toolbar-title v-on:click="routeToHome" flat style="cursor:pointer">Block Charity Point</v-toolbar-title>
       <v-spacer class="hidden-md-and-down"></v-spacer>
       <v-btn flat class="hidden-md-and-down white--text button">ABOUT</v-btn>
       <v-menu transition="slide-y-transition" bottom right>

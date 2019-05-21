@@ -46,24 +46,31 @@
         </div>
       </div>
       <h2 id="exchange_header">EXCHANGE CURRENCY</h2>
+      <div style="display:flex;justify-content:center;align-items:center">
       <div id="linepoint">
         <img class="point" src="../assets/line.svg">
         <v-text-field
-          v-model="displayCurrency"
+          v-model="displayLIPCurrency"
           v-validate="'required|numeric|max_value:' + user.linepoint"
-          data-vv-name="point"
-          :error-messages="errors.collect('point')"
+          data-vv-name="linepoint"
+          :error-messages="errors.collect('linepoint')"
           label="Line point"
           prefix="$"
-          placeholder="enter your point"
+          placeholder="Enter"
           color="cyan"
           class="ex_text"
         ></v-text-field>
       </div>
+      <div id="arrowWraper">
+        <img class="arrow" src="../assets/right.svg">
+        <div id="btn_submit">
+          <v-btn @click="submitLinetoBCP" color="cyan">Submit</v-btn>
+        </div>
+      </div>
       <div id="bcppoint">
         <img class="point" src="../assets/money-bag.svg">
         <v-text-field
-          v-model="exCurrency"
+          v-model="exBCPCurrency"
           label="BCP point"
           prefix="$"
           color="cyan"
@@ -71,8 +78,39 @@
           class="ex_text"
         ></v-text-field>
       </div>
-      <div id="btn_submit">
-        <v-btn @click="submit" color="warning">Submit</v-btn>
+      </div>
+      <div style="display:flex;justify-content:center;align-items:center">
+      <div id="bcppoint">
+        <img class="point" src="../assets/money-bag.svg">
+        <v-text-field
+          v-model="displayBCPCurrency"
+          v-validate="'required|numeric|max_value:' + user.bcppoint"
+          data-vv-name="bcppoint"
+          :error-messages="errors.collect('bcppoint')"
+          label="BCP point"
+          prefix="$"
+          placeholder="Enter"
+          color="cyan"
+          class="ex_text"
+        ></v-text-field>
+      </div>
+      <div id="arrowWraper">
+        <img class="arrow" src="../assets/right.svg">
+        <div id="btn_submit">
+          <v-btn @click="submitBCPtoLine" color="green">Submit</v-btn>
+        </div>
+      </div>
+      <div id="linepoint">
+        <img class="point" src="../assets/line.svg">
+        <v-text-field
+          v-model="exLIPCurrency"
+          label="LIP point"
+          prefix="$"
+          color="cyan"
+          readonly
+          class="ex_text"
+        ></v-text-field>
+      </div>
       </div>
     </div>
     <div v-else id="exchange_OK">
@@ -84,13 +122,16 @@
 <script>
 import { mapState } from "vuex";
 import { Networks } from "../web3/networks";
+import * as LIPContract from "../web3/contract/LIPContract"
+import * as BCPContract from "../web3/contract/BCPContract"
 export default {
   data() {
     return {
       user: {
         linepoint: null,
         bcppoint: null,
-        ex_linepoint: 0
+        ex_linepoint: 0,
+        ex_bcppoint: 0,
       },
       isSubmit: false,
     };
@@ -132,12 +173,11 @@ export default {
     }, 500);
   },
   methods: {
-    submit() {
-      this.$validator.validateAll().then(valid => {
+    submitLinetoBCP() {
+      this.$validator.validate('linepoint').then(valid => {
         if (valid) {
           console.log("submit");
-          this.isSubmit = true
-          let LIPAddress = "0x699D3BAA37c46aE9A3A83d0Cc43161651F0f7083"
+          let LIPAddress = LIPContract.address
           console.log(this.user.ex_linepoint)
           this.$store.state.BCPContractInstance().LIPtoBCP(
             LIPAddress,
@@ -151,6 +191,32 @@ export default {
                 console.log(err);
               } else {
                 console.log(result)
+                this.isSubmit = true
+              }
+            }
+          );
+        }
+      });
+    },
+    submitBCPtoLine() {
+      this.$validator.validate('bcppoint').then(valid => {
+        if (valid) {
+          console.log("submit");
+          console.log(this.user.ex_bcppoint)
+          let LIPAddress = LIPContract.address
+          this.$store.state.BCPContractInstance().BCPtoLIP(
+            LIPAddress,
+            this.user.ex_bcppoint,
+            {
+              gas: 3000000,
+              from: this.$store.state.web3.coinbase
+            },
+            (err, result) => {
+              if (err) {
+                console.log(err);
+              } else {
+                console.log(result)
+                this.isSubmit = true
               }
             }
           );
@@ -170,19 +236,32 @@ export default {
       }
     }),
 
-    exCurrency: {
+    exBCPCurrency: {
       get() {
         return this.user.ex_linepoint * 2;
       }
     },
-    displayCurrency: {
+    exLIPCurrency: {
+      get() {
+        return this.user.ex_bcppoint / 2;
+      }
+    },
+    displayLIPCurrency: {
       get() {
         return this.user.ex_linepoint || "";
       },
       set(value) {
         this.user.ex_linepoint = value;
       }
-    }
+    },
+    displayBCPCurrency: {
+      get() {
+        return this.user.ex_bcppoint || "";
+      },
+      set(value) {
+        this.user.ex_bcppoint = value;
+      }
+    },
   }
 };
 </script>
@@ -256,9 +335,20 @@ export default {
     align-items: center;
     padding: 30px;
   }
+  #arrowWraper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
   .point {
     display: block;
     width: 84px;
+  }
+  .arrow {
+    display: block;
+    width: 40px;
   }
   #btn_submit {
     grid-column-start: 1;

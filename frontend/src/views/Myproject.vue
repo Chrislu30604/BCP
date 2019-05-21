@@ -9,9 +9,10 @@
                 <div class="headline">{{ item.title }}</div>
               </div>
             </v-card-title>
-            <v-img src="https://i.imgur.com/mpcjHrA.jpg" height="300px"></v-img>
+            <v-img :src="item.imgURL" height="300px"></v-img>
             <v-card-text
-            >{{ item.description }}</v-card-text>
+            >{{ item.description }}
+            </v-card-text>
             <v-progress-linear
               color="cyan"
               height="5"
@@ -32,6 +33,8 @@
 
 
 <script>
+import * as BCPContract from "../web3/contract/BCPContract"
+import * as LIPContract from "../web3/contract/LIPContract"
 export default {
   data() {
     return {
@@ -45,7 +48,7 @@ export default {
     };
   },
   async beforeCreate() {
-    await this.$store.dispatch('registerWeb3') 
+    // await this.$store.dispatch('registerWeb3') 
     await this.$store.dispatch("getPlatformContractInstance");
     setTimeout(() => {
         this.$store.state.PlatformContractInstance().getMission(
@@ -70,8 +73,8 @@ export default {
   },
   methods: {
       closeMission() {
-        const BCPAddress = "0xDEcF01E2DCfDA51d64271546ee7150F956A1128B"
-        const LIPAddress = "0x699D3BAA37c46aE9A3A83d0Cc43161651F0f7083"
+        const BCPAddress = BCPContract.address
+        const LIPAddress = LIPContract.address
         this.$store.state.PlatformContractInstance().closeMission(
         BCPAddress,
         LIPAddress,
@@ -94,5 +97,10 @@ export default {
 
 
 <style lang="scss">
-
+#my-proj {
+  .row {
+    width: 430px;
+    margin-top: 30px;
+  }
+}
 </style>

@@ -76,7 +76,7 @@
                       required
                     ></v-text-field>
                   </template>
-                  <v-date-picker v-model="user.date" @input="menu = false" :min="today"></v-date-picker>
+                  <v-date-picker v-model="user.enddate" @input="menu = false" :min="today"></v-date-picker>
                 </v-menu>
                 <v-textarea
                   prepend-icon="description"
@@ -145,7 +145,6 @@ export default {
   },
 
   async beforeMount() {
-    await this.$store.dispatch('registerWeb3') 
     await this.$store.dispatch("getPlatformContractInstance");
   },
 
@@ -154,13 +153,13 @@ export default {
   },
 
   methods: {
-    submitToSmartContract() {
+    submitToSmartContract(obj) {
       this.$store.state.PlatformContractInstance().addMission(
-        "HI",
-        "HI description",
-        "https",
-        "https",
-        1000,
+        obj.title,
+        obj.description,
+        obj.url,
+        obj.url,
+        parseInt(obj.dollars, 10),
         {
           gas: 3000000,
           from: this.$store.state.web3.coinbase
@@ -173,7 +172,6 @@ export default {
           }
         }
       );
-      // value: this.$store.state.web3.web3Instance().toWei(0.00001, 'ether'),
     },
 
     submit() {
@@ -219,19 +217,20 @@ export default {
           Postform.append("description", obj.description)
           Postform.append("url", obj.url)
 
+          // Send to backend
           await this.axios
             .post(url,
                   Postform,
                   configs)
             .then((response) => {
               console.log(response)
+              /* Send to Smart Contract */
+              this.submitToSmartContract(obj);
+
             })
             .catch((error) => {
               console.log(error)
             })
-
-          /* Send to Smart Contract */
-          this.submitToSmartContract(obj);
         }
       });
     },

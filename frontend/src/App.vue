@@ -21,7 +21,10 @@ export default {
     return {
       //
     }
-  }
+  },
+  async beforeMount() {
+    await this.$store.dispatch('registerWeb3') 
+  },
 }
 </script>
 
