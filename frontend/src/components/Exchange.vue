@@ -139,14 +139,15 @@ export default {
 
   async beforeMount() {
     console.log("submit exchange");
-    await this.$store.dispatch("getBCPContractInstance");
-    await this.$store.dispatch("getLIPContractInstance")
+    await this.$store.dispatch("web3/getBCPContractInstance");
+    await this.$store.dispatch("web3/getLIPContractInstance")
     setTimeout(() => {
-      this.$store.state.BCPContractInstance().balanceOf(
-        this.$store.state.web3.coinbase,
+
+      this.BCPContractInstance().balanceOf(
+        this.coinbase,
         {
           gas: 3000000,
-          from: this.$store.state.web3.coinbase
+          from: this.coinbase
         },
         (err, result) => {
           if (err) {
@@ -156,11 +157,11 @@ export default {
           }
         }
       );
-      this.$store.state.LIPContractInstance().balanceOf(
-        this.$store.state.web3.coinbase,
+      this.LIPContractInstance().balanceOf(
+        this.coinbase,
         {
           gas: 3000000,
-          from: this.$store.state.web3.coinbase
+          from: this.coinbase
         },
         (err, result) => {
           if (err) {
@@ -179,12 +180,12 @@ export default {
           console.log("submit");
           let LIPAddress = LIPContract.address
           console.log(this.user.ex_linepoint)
-          this.$store.state.BCPContractInstance().LIPtoBCP(
+          this.BCPContractInstance().LIPtoBCP(
             LIPAddress,
             this.user.ex_linepoint,
             {
               gas: 3000000,
-              from: this.$store.state.web3.coinbase
+              from: this.coinbase
             },
             (err, result) => {
               if (err) {
@@ -204,12 +205,12 @@ export default {
           console.log("submit");
           console.log(this.user.ex_bcppoint)
           let LIPAddress = LIPContract.address
-          this.$store.state.BCPContractInstance().BCPtoLIP(
+          this.BCPContractInstance().BCPtoLIP(
             LIPAddress,
             this.user.ex_bcppoint,
             {
               gas: 3000000,
-              from: this.$store.state.web3.coinbase
+              from: this.coinbase
             },
             (err, result) => {
               if (err) {
@@ -225,16 +226,18 @@ export default {
     }
   },
   computed: {
-    ...mapState({
+    ...mapState('web3/',{
       isInjected: state => state.web3.isInjected,
       network: state => Networks[state.web3.networkId],
       coinbase: state => state.web3.coinbase,
       balance: state => state.web3.balance,
-      ethBalance: state => {
-        if (state.web3.web3Instance !== null)
-          return state.web3.web3Instance().fromWei(state.web3.balance, "ether");
-      }
+      web3Instance: state => state.web3.web3Instance,
+      BCPContractInstance: state => state.BCPContractInstance,
+      LIPContractInstance: state => state.LIPContractInstance,
     }),
+    ethBalance() {
+      return this.web3Instance().fromWei(this.balance, "ether")
+    },
 
     exBCPCurrency: {
       get() {

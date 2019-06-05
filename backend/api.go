@@ -14,10 +14,17 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-var client *mongo.Client
 var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
-// User defined the launch project content
+var (
+	regexEmail   = regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`)
+	regexDollars = regexp.MustCompile(`^[0-9]*$`)
+	regexID      = regexp.MustCompile("^[a-zA-Z0-9]*$")
+	regexName    = regexp.MustCompile("^[a-zA-Z ]*$")
+	regexBirth   = regexp.MustCompile(`\d{2}/\d{2}/\d{4}`)
+)
+
+// Propose the launch project content
 type Propose struct {
 	Title       string `json:"title"`
 	Name        string `json:"name"`
@@ -25,33 +32,76 @@ type Propose struct {
 	Dollars     string `json:"dollars"`
 	Enddate     string `json:"enddate"`
 	Description string `json:"description"`
-	Url         string `json:"url"`
+	URL         string `json:"url"`
 }
 
 type Register struct {
-	Base
-	Detail
-}
-
-type Base struct {
-	ID       string `json:"id" bson:"id"`
-	Password string `json:"password" bson:"password"`
-	Email    string `json:"email" bosn:"email"`
-}
-type Detail struct {
-	Name           string `json:"name"`
-	Identification string `json:"Identification"`
-	Birth          string `json:"Birth"`
+	ID             string `json:"id" bson:"id"`
+	Password       string `json:"password" bson:"password"`
+	Email          string `json:"email" bson:"email"`
+	Name           string `json:"name" bson:"name"`
+	Identification string `json:"identification" bson:"identification"`
+	Birth          string `json:"birth" bson:"birth"`
+	Token          string `json:"token" bson:"token"`
 }
 
 // RegisterUser define user's detail
-type QueryAuth struct {
-	ID       string `json:"id"`
-	password string `json:"password`
-}
 
 func handleLogin(c *gin.Context) {
-	parser := QueryAuth{}
+	var parser struct {
+		ID       string `json:"id" bson:"id"`
+		Password string `json:"password" bson:"password"`
+	}
+	rawdata, err := c.GetRawData()
+	if err != nil {
+		log.Println("ERROR JSON Raw Data")
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	// 2.Unserialize
+	if err := json.Unmarshal(rawdata, &parser); err != nil {
+		log.Println("ERROR Json Key")
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	// 3. Regex Check
+	if regexID.MatchString(parser.ID) &&
+		len(parser.Password) >= 6 {
+
+		// 4.Find Name in Mongodb
+		res, err := FindOne("user", "account", &parser)
+		if err != nil {
+			log.Println("Error find the DB")
+			c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+			return
+		}
+		b, err := bson.Marshal(res)
+		if err != nil {
+			log.Println("Error in bson Marshal")
+			c.JSON(http.StatusExpectationFailed, gin.H{"error": err.Error()})
+			return
+		}
+		parser := Register{}
+		if err = bson.Unmarshal(b, &parser); err != nil {
+			log.Println("Error Json Unmarshal")
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{
+			"id":             parser.ID,
+			"email":          parser.Email,
+			"name":           parser.Name,
+			"identification": parser.Identification,
+			"birth":          parser.Birth,
+			"token":          parser.Token,
+		})
+		return
+	}
+}
+
+func handlePropose(c *gin.Context) {
+	// 2. Parser the purpose info
+	parser := Propose{}
 	rawdata, err := c.GetRawData()
 	if err != nil {
 		log.Println("ERROR Json Raw Data")
@@ -59,73 +109,23 @@ func handleLogin(c *gin.Context) {
 		return
 	}
 	// 2.Unserialize
-	err = json.Unmarshal(rawdata, &parser)
-	if err != nil {
+	if err = json.Unmarshal(rawdata, &parser); err != nil {
 		log.Println("ERROR Json Key")
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	// 3. Regex Check
-	regexID := regexp.MustCompile("^[a-zA-Z0-9]*$")
-	if regexID.MatchString(parser.ID) &&
-		len(parser.password) >= 6 {
-
-		// 4.Find Name in Mongodb
-		res := findMongoDB("user", "account", "id", parser.ID)
-		if res != true {
-			log.Println("User Not Found")
-			c.JSON(http.StatusBadRequest, gin.H{"status": "User Not Found"})
-			return
-		}
-		// 5. Check Password is true or not
-	}
-}
-
-func handlePropose(c *gin.Context) {
-	/*
-		// 1. Create img Folder
-		file, header, err := c.Request.FormFile("file")
-		if err != nil {
-			log.Println("Error File")
-			return
-		}
-		rand.Seed(time.Now().UnixNano())
-		filename := randSeq(10) + "_" + header.Filename
-		out, err := os.Create("./tmp/" + filename)
-		if err != nil {
-			log.Println("Create Fail ", err)
-			return
-		}
-		defer out.Close()
-		_, err = io.Copy(out, file)
-		if err != nil {
-			log.Fatal(err)
-		}
-	*/
-	// 2. Parser the purpose info
-	parser := Propose{}
-	parser.Title = c.PostForm("title")
-	parser.Name = c.PostForm("name")
-	parser.Email = c.PostForm("email")
-	parser.Enddate = c.PostForm("enddate")
-	parser.Dollars = c.PostForm("dollars")
-	parser.Description = c.PostForm("description")
-	parser.Url = c.PostForm("url")
-	log.Println(parser)
-
-	// 3. Regex Check
-	regexEmail := regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`)
-	regexDollars := regexp.MustCompile(`^[0-9]*$`)
 	if regexEmail.MatchString(parser.Email) &&
 		regexDollars.MatchString(parser.Dollars) {
 		// 4. Insert To DB
 		log.Println("Insert in MongoDB")
-		res := insertMongoDB("user", "propose", &parser)
-		if res != true {
+		res, err := InsertOne("user", "propose", &parser)
+		if err != nil {
 			log.Println("Insert Fail")
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Insert Fail"})
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
+		log.Println(res)
 		c.JSON(http.StatusOK, gin.H{"status": "OK"})
 	}
 }
@@ -154,7 +154,11 @@ func handleGetPropose(c *gin.Context) {
 }
 
 func handleQueryName(c *gin.Context) {
-	parser := Base{}
+	var parser struct {
+		ID       string `json:"id" bson:"id"`
+		Password string `json:"password" bson:"password"`
+		Email    string `json:"email" bson:"email"`
+	}
 	// 1.Check Receive Data
 	rawdata, err := c.GetRawData()
 	if err != nil {
@@ -163,34 +167,33 @@ func handleQueryName(c *gin.Context) {
 		return
 	}
 	// 2.Unserialize
-	err = json.Unmarshal(rawdata, &parser)
-	if err != nil {
+	if err = json.Unmarshal(rawdata, &parser); err != nil {
 		log.Println("ERROR Json Key")
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	// 3. Regex Check
-	regexID := regexp.MustCompile("^[a-zA-Z0-9]*$")
-	regexEmail := regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`)
 	if regexID.MatchString(parser.ID) && regexEmail.MatchString(parser.Email) && len(parser.Password) >= 6 {
-
 		// 4.Find Name in Mongodb
-		res := findMongoDB("user", "account", "id", parser.ID)
-		if res != true {
-			log.Println("User Already in use")
-			c.JSON(http.StatusBadRequest, gin.H{"status": "User Already in use"})
+		parse := bson.D{
+			{"$or",
+				bson.A{
+					bson.D{{"id", parser.ID}},
+					bson.D{{"email", parser.Email}}},
+			}}
+		res, err := Find("user", "account", parse)
+		// 5. If find the email or id in db, then
+		if err != nil {
+			log.Println("Error Query in mongodb")
+			c.JSON(http.StatusBadRequest, gin.H{"status": err.Error()})
+		}
+		if len(res) == 0 {
+			c.JSON(http.StatusOK, gin.H{"status": "OK"})
+		} else {
+			c.JSON(http.StatusOK, gin.H{"status": "ID Already in used"})
 			return
 		}
-		// 5. Find Email in Mongodb
-		res = findMongoDB("user", "account", "email", parser.Email)
-		if res != true {
-			log.Println("Email Already in use")
-			c.JSON(http.StatusBadRequest, gin.H{"status": "Email Already in use"})
-			return
-		}
-
-		log.Println("Query Success", parser)
-		c.JSON(http.StatusOK, gin.H{"status": "OK"})
+		return
 	} else {
 		log.Fatal("ERROR Json Key")
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -215,66 +218,79 @@ func handleRegister(c *gin.Context) {
 		return
 	}
 	// 3. Regex Check
-	regexID := regexp.MustCompile("^[a-zA-Z0-9]*$")
-	regexEmail := regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`)
-	regexName := regexp.MustCompile("^[a-zA-Z]*$")
-	regexBirth := regexp.MustCompile(`\d{2}/\d{2}/\d{4}`)
-	if regexID.MatchString(parser.Base.ID) &&
-		regexEmail.MatchString(parser.Base.Email) &&
-		regexName.MatchString(parser.Detail.Name) &&
-		regexBirth.MatchString(parser.Detail.Birth) &&
-		len(parser.Base.Password) >= 6 {
+	if regexID.MatchString(parser.ID) &&
+		regexEmail.MatchString(parser.Email) &&
+		regexName.MatchString(parser.Name) &&
+		regexBirth.MatchString(parser.Birth) &&
+		len(parser.Password) >= 6 {
+		// 4. Generate JWT token
+		token, err := GenerateToken(parser.ID, parser.Password)
+		parser.Token = token
+		if err != nil {
+			log.Println("Error Generate JWT token")
+		}
 		log.Println("Insert in MongoDB")
-		res := insertMongoDB("user", "account", &parser)
-		if res != true {
+
+		_, err = InsertOne("user", "account", &parser)
+		if err != nil {
 			log.Println("Insert Fail")
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Insert Fail"})
 			return
 		}
-		c.JSON(http.StatusOK, gin.H{"status": "OK"})
+		c.JSON(http.StatusOK, gin.H{
+			"status": "OK",
+			"token":  parser.Token,
+		})
 	}
 }
 
-func findMongoDB(databaseName string, collectionName string, queryKey string, data string) bool {
-	// Connect to mongodb
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:27017"))
+func handleAuth(c *gin.Context) {
+	token := c.PostForm("token")
+	if token == "" {
+		log.Println("No token")
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "bad token"})
+		return
+	}
+	claims, err := ParseToken(token)
 	if err != nil {
-		log.Fatal("Error connect to Mongodb", err)
+		log.Println("Error Auth check")
+		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		return
+	} else if time.Now().Unix() > claims.ExpiresAt {
+		log.Println("Error token timeout")
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "token timeout"})
+		return
 	}
-	defer cancel()
-	// Query Name
-	collection := client.Database(databaseName).Collection(collectionName)
-	cur, err := collection.Find(context.Background(), bson.M{queryKey: data})
-	defer cur.Close(ctx)
-	// If find, return false
-	for cur.Next(ctx) {
-		var user Base
-		if err := cur.Decode(&user); err != nil {
-			log.Fatal(err)
-		}
-		log.Println(user)
-		return false
-	}
-	return true
-}
-
-func insertMongoDB(databaseName string, collectionName string, data interface{}) bool {
-	// Connect to mongodb
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:27017"))
+	query := bson.D{
+		{"$and",
+			bson.A{
+				bson.D{{"id", claims.ID}},
+				bson.D{{"token", token}}},
+		}}
+	res, err := FindOne("user", "account", &query)
 	if err != nil {
-		log.Fatal("Error connect to Mongodb", err)
-		return false
+		log.Println("Error find the DB")
+		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		return
 	}
-	defer cancel()
-	// Insert Bson to mongodb
-	collection := client.Database(databaseName).Collection(collectionName)
-	res, err := collection.InsertOne(context.Background(), data)
+	b, err := bson.Marshal(res)
 	if err != nil {
-		log.Println("Error Insert", err)
-		return false
+		log.Println("Error in bson Marshal")
+		c.JSON(http.StatusExpectationFailed, gin.H{"error": err.Error()})
+		return
 	}
-	log.Println("ObjectID: ", res.InsertedID)
-	return true
+	parser := Register{}
+	if err = bson.Unmarshal(b, &parser); err != nil {
+		log.Println("Error Json Unmarshal")
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"id":             parser.ID,
+		"email":          parser.Email,
+		"name":           parser.Name,
+		"identification": parser.Identification,
+		"Birth":          parser.Birth,
+	})
+	return
 }

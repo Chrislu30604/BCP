@@ -8,7 +8,7 @@
         <v-form style="margin-bottom:30px;width:300px;">
           <v-text-field
             v-model="user.id"
-            v-validate="'required|alpha_num|'"
+            v-validate="'required|alpha_num'"
             data-vv-name="id"
             :error-messages="errors.collect('id')"
             prepend-icon="person"
@@ -60,9 +60,17 @@ export default {
         if(valid) {
          const url = "http://127.0.0.1:8081/login"
          let obj = this.user
-         this.axios.get(url, obj)
+         this.axios.post(url, obj)
          .then((response) => {
-           console.log(response)
+           if (response.status === 200) {
+              this.$store.commit('account/toggleLoginToken', response.data.token)
+              this.$store.commit('account/setUserInfo', response.data)
+              this.$cookies.set("token", response.data.token, "4m")
+              this.$router.push("/account")
+           }
+         })
+         .catch((error) => {
+           console.log(error)
          }) 
         }
       })

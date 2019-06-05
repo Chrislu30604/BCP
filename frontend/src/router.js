@@ -10,19 +10,20 @@ import LoginFirst from "./views/LoginFirst.vue"
 import Myproject from "./views/Myproject.vue"
 Vue.use(Router)
 
-export default new Router({
-  mode: 'history',
-  base: process.env.BASE_URL,
-  routes: [
+
+// export default new Router({
+  // mode: 'history',
+  // base: process.env.BASE_URL,
+const routes = [
     {
       path: '/',
       name: 'home',
-      component: Home
+      component: Home,
     },
     {
       path: '/about',
       name: 'about',
-      component: () => import(/* webpackChunkName: "about" */ './views/About.vue')
+      component: () => import( /* webpackChunkName: "about" */ './views/About.vue')
     },
     {
       path: '/project',
@@ -37,7 +38,10 @@ export default new Router({
     {
       path: '/account',
       name: 'account',
-      component: Account 
+      component: Account,
+      meta: {
+        requiresAuth: true
+      },
     },
     {
       path: '/login',
@@ -58,6 +62,15 @@ export default new Router({
       path: '/myproject',
       name: 'myproject',
       component: Myproject,
+      meta: {
+        requiresAuth: true
+      }
     }
   ]
-})
+
+const router = new Router({
+  routes,
+  mode: 'history'
+});
+
+export default router

@@ -71,13 +71,16 @@ export default {
       this.axios.post(url, obj)
         .then(response => {
           if (response.data.status === "OK") {
-            console.log("response")
+            // Set token 
+            this.$store.commit('account/toggleLoginToken', response.data.token)
+            this.$store.commit('account/setUserInfo', obj)
+            // Set cookie
+            this.$cookies.remove("token");
+            this.$cookies.set("token", response.data.token, "4m")
             this.success()
-            .then(() => {
-              setTimeout(() => {
-                this.$router.push({path:'/project'})
-              }, 1000);
-            })
+            setTimeout(() => {
+              this.$router.push({path:'/project'})
+            }, 1000);
           }
         })
         .catch(error => {

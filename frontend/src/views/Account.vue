@@ -9,9 +9,9 @@
       </div>
       <div id="main">
         <div id="header">
-          <avatar class="avatar" username="Jane Doewd" :size="64"></avatar>
+          <avatar class="avatar" :username="user.name" :size="64"></avatar>
           <div>
-            <h2>Jane Dowdewq</h2>
+            <h2>{{ user.name }}</h2>
             <span>Member since Aug 09, 2018</span>
           </div>
         </div>
@@ -32,6 +32,7 @@
 
 <script>
 import Avatar from "vue-avatar";
+import { mapState } from "vuex";
 import Overview from '@/components/Overview'
 import Exchange from '@/components/Exchange'
 export default {
@@ -52,6 +53,15 @@ export default {
       ],
     };
   },
+  computed: {
+    ...mapState('account/',{
+      user: state => state.user
+    })
+  },
+
+  async beforeMount() {
+  },
+
 
   methods: {
     select(event, name) {
@@ -65,10 +75,6 @@ export default {
       this.selected = name;
       event.target.style.background = "#ffb74d"; // change new click color
       this.lastClick = event;
-      if(this.selected === "Exchange") {
-        console.log("-----MetaMask------")
-        this.$store.dispatch('registerWeb3') 
-      }
     },
   },
 };
@@ -97,7 +103,7 @@ export default {
   grid-column-start: 1;
   grid-column-end: 2;
   background-color: #424242;
-  height: 80%;
+  height: 86%;
   /*flexbox*/
   display: flex;
   flex-direction: column;
@@ -143,7 +149,7 @@ export default {
   grid-column-start: 2;
   grid-column-end: 3;
   background-color: #424242;
-  height: 80%;
+  height: 86%;
   padding: 32px;
   display: grid;
   grid-template-rows: 80px auto;

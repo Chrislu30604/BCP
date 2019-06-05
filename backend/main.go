@@ -26,7 +26,8 @@ func main() {
 	router.Static("/img", "../frontend/dist/img")
 	router.Static("/js", "../frontend/dist/js")
 
-	router.GET("/login", handleLogin)
+	router.POST("/login", handleLogin)
+	router.POST("/auth", handleAuth)
 	launch := router.Group("/launch")
 	{
 		launch.POST("/propose", handlePropose)

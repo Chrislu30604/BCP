@@ -11,6 +11,7 @@
           prepend-icon="email"
           color="cyan"
           class="input_text"
+          readonly
           required
         ></v-text-field>
         <v-text-field
@@ -68,11 +69,11 @@
       <h2>ACCOUNT INFORMATION</h2>
       <v-form>
         <v-text-field
-          v-model="user.username"
+          v-model="user.name"
           v-validate="'required|max:20|alpha_spaces'"
           :counter="20"
-          data-vv-name="username"
-          :error-messages="errors.collect('username')"
+          data-vv-name="name"
+          :error-messages="errors.collect('name')"
           color="cyan"
           prepend-icon="account_circle"
           placeholder="Full Name"
@@ -122,18 +123,25 @@ export default {
   data() {
     return {
       user: {
-        email: "chrislu30604",
+        email: "",
         new_email: "",
         password: "",
         new_password: "",
         match_password: "",
-        username: "",
+        name: "",
         company: "",
         phone: "",
         profile_url: ""
       }
     };
-  }
+  },
+  computed: {
+  },
+  mounted() {
+    const user = this.$store.getters["account/user"]
+    this.user.email = user.email
+    this.user.name = user.name
+  },
 };
 </script>
 

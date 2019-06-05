@@ -78,7 +78,7 @@ export default {
       this.item = response.data;
     });
 
-    await this.$store.dispatch("getPlatformContractInstance");
+    await this.$store.dispatch("web3/getPlatformContractInstance");
   },
 
   methods: {

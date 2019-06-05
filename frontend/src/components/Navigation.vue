@@ -22,7 +22,7 @@
     </v-navigation-drawer>
     <v-toolbar app fixed clipped-left flat scroll-off-screen style="background:rgba(0,0,0,0)">
       <v-toolbar-side-icon @click.prevent="drawer = !drawer"></v-toolbar-side-icon>
-      <img src="../assets/owl.svg" v-on:click="routeToHome" style="margin-left:30px;width:40px;cursor:pointer">
+      <img src="../assets/blockchain.svg" v-on:click="routeToHome" style="margin-left:30px;width:40px;cursor:pointer">
       <v-toolbar-title v-on:click="routeToHome" flat style="cursor:pointer">Block Charity Point</v-toolbar-title>
       <v-spacer class="hidden-md-and-down"></v-spacer>
       <v-btn flat class="hidden-md-and-down white--text button">ABOUT</v-btn>
@@ -63,11 +63,15 @@ export default {
       ],
       account: [
         { title: "Login", von: this.routeToLogin },
+        { title: "Logout", von: this.logout },
         { title: "Register", von: this.routeToRegister},
         { title: "Info", von: this.routeToAccount },
       ],
-      drawer: false
+      drawer: false,
+      isLogin: false,
     };
+  },
+  computed: {
   },
   methods: {
     routeToHome() {
@@ -90,7 +94,11 @@ export default {
     },
     routeToMyproject() {
       this.$router.push("/myproject")
-    }
+    },
+    logout() {
+      this.$cookies.remove("token")
+      this.$router.push("/")
+    },
   }
 };
 </script>
