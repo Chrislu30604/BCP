@@ -7,6 +7,7 @@ import VueCookies from 'vue-cookies'
 import App from './App.vue'
 import router from './router'
 import {store} from './store/store'
+import URL from './parameter/ip'
 
 Vue.use(VueAxios, axios);
 Vue.use(VeeValidate);
@@ -19,7 +20,8 @@ router.beforeEach((to, from, next) => {
     // this route requires auth, check if logged in
     // if not, redirect to login page.
     // If has cookie in JWT token , validate it!
-    const url = "http://127.0.0.1:8081/auth"
+    const url = URL.auth
+    console.log(url)
     const token = VueCookies.get("token")
     const form = new FormData();
     form.append("token", token)

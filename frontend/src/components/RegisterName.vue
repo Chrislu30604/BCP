@@ -45,6 +45,7 @@
 
 
 <script>
+import URL from "../parameter/ip"
 export default {
   name: "RegisterName",
   data() {
@@ -61,7 +62,7 @@ export default {
       this.$validator.validateAll().then(valid => {
         if (valid) {
           console.log("post queryName");
-          const url = "http://127.0.0.1:8081/register/queryName";
+          const url = URL.register.queryName
           let obj = this.register;
           this.axios
             .post(url, obj)

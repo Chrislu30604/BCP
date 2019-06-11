@@ -125,6 +125,7 @@
 
 <script>
 import UploadButton from 'vuetify-upload-button';
+import URL from "../parameter/ip"
 export default {
   data() {
     return {
@@ -202,7 +203,7 @@ export default {
 
           // 2. Post Information to Backend
 
-          const url = "http://127.0.0.1:8081/launch/propose";
+          const url = URL.launch.propose
           const obj = this.user
           let configs = { headers: {
             'accept': 'application/json',

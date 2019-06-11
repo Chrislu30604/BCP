@@ -31,6 +31,7 @@
 <script>
 import RegisterName from "@/components/RegisterName"
 import RegisterDetail from "@/components/RegisterDetail"
+import URL from "../parameter/ip"
 export default {
   data() {
     return {
@@ -66,7 +67,7 @@ export default {
       this.register.name = arg.name
       this.register.identification = arg.identification
       this.register.birth = arg.birth
-      const url = "http://127.0.0.1:8081/register/register"
+      const url = URL.register.register
       let obj = this.register;
       this.axios.post(url, obj)
         .then(response => {

@@ -43,6 +43,7 @@ func FindOne(db, collection string, query interface{}) (interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	return v, err
 }
 

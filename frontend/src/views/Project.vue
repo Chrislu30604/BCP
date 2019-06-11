@@ -63,6 +63,7 @@
 
 <script>
 import {address} from "../web3/contract/BCPContract"
+import URL from "../parameter/ip"
 export default {
   data() {
     return {
@@ -72,7 +73,7 @@ export default {
     };
   },
   async beforeCreate() {
-    const url = "http://127.0.0.1:8081/launch/propose";
+    const url = URL.launch.propose
     this.axios.get(url).then(response => {
       console.log(response.data);
       this.item = response.data;
