@@ -24,6 +24,7 @@
             data-vv-name="password"
             :error-messages="errors.collect('password')"
             prepend-icon="lock"
+            v-on:keyup.enter="submit"
             name="password"
             label="Password"
             id="password"
@@ -32,7 +33,7 @@
             required
           ></v-text-field>
         </v-form>
-        <v-btn color="info" v-on:click="submit" depressed>Sigin</v-btn>
+        <v-btn color="info" v-on:click="submit"  depressed>Sigin</v-btn>
         <div id="createPassword">
           <a>Forgot Password?</a>
           <span>|</span>

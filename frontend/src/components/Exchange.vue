@@ -1,6 +1,10 @@
 <template>
   <div style="height:100%">
-    <div v-if="!isSubmit" id="exchange">
+    <div v-if="!isInjected" id="status">
+      <img src="../assets/crying.svg" style="width:70px;margin-right:10px;">
+      <h1>You need to login Metamask</h1>
+    </div>
+    <div v-else-if="!isSubmit" id="exchange">
       <h2 id="currency_header">YOUR CURRENCY & ACCOUNT</h2>
       <div id="Lcurrency">
         <v-layout row>
@@ -113,7 +117,7 @@
       </div>
       </div>
     </div>
-    <div v-else id="exchange_OK">
+    <div v-else-if="isSubmit" id="status">
       <h1>You are Successfully exchange point!!</h1>
     </div>
   </div>
@@ -138,40 +142,40 @@ export default {
   },
 
   async beforeMount() {
-    console.log("submit exchange");
-    await this.$store.dispatch("web3/getBCPContractInstance");
-    await this.$store.dispatch("web3/getLIPContractInstance")
-    setTimeout(() => {
-
-      this.BCPContractInstance().balanceOf(
-        this.coinbase,
-        {
-          gas: 3000000,
-          from: this.coinbase
-        },
-        (err, result) => {
-          if (err) {
-            console.log(err);
-          } else {
-            this.user.bcppoint = result.c[0];
+    if (this.isInjected) {
+      await this.$store.dispatch("web3/getBCPContractInstance");
+      await this.$store.dispatch("web3/getLIPContractInstance")
+      setTimeout(() => {
+        this.BCPContractInstance().balanceOf(
+          this.coinbase,
+          {
+            gas: 3000000,
+            from: this.coinbase
+          },
+          (err, result) => {
+            if (err) {
+              console.log(err);
+            } else {
+              this.user.bcppoint = result.c[0];
+            }
           }
-        }
-      );
-      this.LIPContractInstance().balanceOf(
-        this.coinbase,
-        {
-          gas: 3000000,
-          from: this.coinbase
-        },
-        (err, result) => {
-          if (err) {
-            console.log(err);
-          } else {
-            this.user.linepoint = result.c[0];
+        );
+        this.LIPContractInstance().balanceOf(
+          this.coinbase,
+          {
+            gas: 3000000,
+            from: this.coinbase
+          },
+          (err, result) => {
+            if (err) {
+              console.log(err);
+            } else {
+              this.user.linepoint = result.c[0];
+            }
           }
-        }
-      );
-    }, 500);
+        );
+      }, 500);
+    }
   },
   methods: {
     submitLinetoBCP() {
@@ -235,8 +239,10 @@ export default {
       BCPContractInstance: state => state.BCPContractInstance,
       LIPContractInstance: state => state.LIPContractInstance,
     }),
-    ethBalance() {
-      return this.web3Instance().fromWei(this.balance, "ether")
+    ethBalance: {
+      get() {
+        return this.web3Instance().fromWei(this.balance, "ether")
+      }
     },
 
     exBCPCurrency: {
@@ -271,13 +277,13 @@ export default {
 
 
 <style lang="scss">
-#exchange_OK {
+#status {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100%;
   h1 {
-    color: #5fd89c;
+    color: white;
     size: 28px;
   }
 

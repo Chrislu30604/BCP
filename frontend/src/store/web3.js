@@ -58,7 +58,7 @@ let web3 = {
                 console.log('register web3 Instance', result)
                 commit('registerWeb3Instance', result)
             }).catch(e => {
-                console.log('error in action registerWeb3', e)
+                console.log('error in action registerWeb3', e.message)
             })
         },
         pollWeb3({

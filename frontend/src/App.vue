@@ -20,7 +20,11 @@ export default {
     };
   },
   async beforeCreate() {
-    await this.$store.dispatch("web3/registerWeb3");
+    try {
+      await this.$store.dispatch("web3/registerWeb3");
+    } catch (error) {
+      console.log("error")
+    }
   }
 };
 </script>
