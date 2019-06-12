@@ -59,7 +59,6 @@ export default {
   methods: {
     submit() {
       this.$validator.validateAll().then(valid => {
-        if(valid) {
          const url = URL.login
          let obj = this.user
          this.axios.post(url, obj)
@@ -74,7 +73,6 @@ export default {
          .catch((error) => {
            console.log(error)
          }) 
-        }
       })
     }
   },

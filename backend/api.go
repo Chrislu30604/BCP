@@ -175,6 +175,7 @@ func handleQueryName(c *gin.Context) {
 	// 3. Regex Check
 	if regexID.MatchString(parser.ID) && regexEmail.MatchString(parser.Email) && len(parser.Password) >= 6 {
 		// 4.Find Name in Mongodb
+		log.Println("start query....")
 		parse := bson.D{
 			{"$or",
 				bson.A{

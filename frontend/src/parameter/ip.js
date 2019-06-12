@@ -1,7 +1,7 @@
 const localhost = "127.0.0.1"
-const host = "35.185.169.116"
-const port = ":8081"
-const ip = "http://" + localhost + port
+const host = "bcpplatform.hopto.org"
+const port = ":80"
+const ip = "https://" + host
 
 
 export default {

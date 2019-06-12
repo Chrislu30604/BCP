@@ -15,16 +15,16 @@ func main() {
 	config.AllowMethods = []string{"POST", "GET"}
 	router.Use(cors.New(config))
 
-	router.LoadHTMLGlob("../frontend/dist/index.html")
+	router.LoadHTMLGlob("./frontend/dist/index.html")
 	router.GET("/", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "index.html", nil)
 	})
 	router.NoRoute(func(c *gin.Context) {
-		c.File("../frontend/dist/index.html")
+		c.File("./frontend/dist/index.html")
 	})
-	router.Static("/css", "../frontend/dist/css")
-	router.Static("/img", "../frontend/dist/img")
-	router.Static("/js", "../frontend/dist/js")
+	router.Static("/css", "./frontend/dist/css")
+	router.Static("/img", "./frontend/dist/img")
+	router.Static("/js", "./frontend/dist/js")
 
 	router.POST("/login", handleLogin)
 	router.POST("/auth", handleAuth)
@@ -44,5 +44,5 @@ func main() {
 		abi.GET("/lip", handleABILIP)
 		abi.GET("/platform", handleABIPlatform)
 	}
-	router.Run(":8081")
+	router.Run(":8080")
 }
