@@ -26,13 +26,14 @@ var (
 
 // Propose the launch project content
 type Propose struct {
-	Title       string `json:"title"`
-	Name        string `json:"name"`
-	Email       string `json:"email"`
-	Dollars     string `json:"dollars"`
-	Enddate     string `json:"enddate"`
-	Description string `json:"description"`
-	URL         string `json:"url"`
+	Title       string `json:"title" bson:"title"`
+	Name        string `json:"name" bson:"name"`
+	Email       string `json:"email" bson:"email"`
+	TargetFund  string `json:"targetFund" bson:"targetFund"`
+	CurrentFund string `json:"currentFund" bson:"currentFund"`
+	Enddate     string `json:"enddate" bson:"enddate"`
+	Description string `json:"description" bson:"description"`
+	URL         string `json:"url" bson:"url"`
 }
 
 type Register struct {
@@ -42,6 +43,7 @@ type Register struct {
 	Name           string `json:"name" bson:"name"`
 	Identification string `json:"identification" bson:"identification"`
 	Birth          string `json:"birth" bson:"birth"`
+	Registertime   string `json:"registertime" bson:"registertime"`
 	Token          string `json:"token" bson:"token"`
 }
 
@@ -108,6 +110,7 @@ func handlePropose(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	log.Println(string(rawdata))
 	// 2.Unserialize
 	if err = json.Unmarshal(rawdata, &parser); err != nil {
 		log.Println("ERROR Json Key")
@@ -116,7 +119,7 @@ func handlePropose(c *gin.Context) {
 	}
 	// 3. Regex Check
 	if regexEmail.MatchString(parser.Email) &&
-		regexDollars.MatchString(parser.Dollars) {
+		regexDollars.MatchString(parser.TargetFund) {
 		// 4. Insert To DB
 		log.Println("Insert in MongoDB")
 		res, err := InsertOne("user", "propose", &parser)

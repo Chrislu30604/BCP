@@ -33,7 +33,10 @@ const routes = [
     {
       path: '/launch',
       name: 'launch',
-      component: Launch
+      component: Launch,
+      meta: {
+        requiresAuth: true
+      },
     },
     {
       path: '/account',

@@ -12,7 +12,7 @@
           <avatar class="avatar" :username="user.name" :size="64"></avatar>
           <div>
             <h2>{{ user.name }}</h2>
-            <span>Member since Aug 09, 2018</span>
+            <span>Member since {{ user.registertime}}</span>
           </div>
         </div>
         <div v-if="selected === 'Overview'">

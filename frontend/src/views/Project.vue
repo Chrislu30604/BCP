@@ -1,7 +1,7 @@
 <template>
   <v-content id="proj">
     <v-container fluid fill-height grid-list-xl style="maxWidth: 80%;">
-      <v-layout justify-space-around row wrap>
+      <v-layout justify-space-around row wrap v-if="item.length">
         <div v-for="(val, idx) in item" :key="idx" class="row">
           <v-card>
             <v-card-title>
@@ -11,14 +11,16 @@
             </v-card-title>
             <v-img :src="val.url" height="300px"></v-img>
             <v-card-text>{{ val.description }}</v-card-text>
-            <v-progress-linear color="cyan" height="5" value="30"></v-progress-linear>
+            <v-progress-linear color="cyan" height="5" :value="progress(val.currentFund, val.targetFund)"></v-progress-linear>
             <v-list-tile>
               <v-list-tile-content>
                 <v-list-tile-sub-title ><v-icon>pregnant_woman</v-icon> Launcher : {{val.name}}</v-list-tile-sub-title>
-                <v-list-tile-sub-title ><v-icon>attach_money</v-icon> Fund: {{val.dollars}}</v-list-tile-sub-title>
+                <v-list-tile-sub-title ><v-icon>attach_money</v-icon> Fund: {{val.targetFund}}</v-list-tile-sub-title>
               </v-list-tile-content>
               <v-list-tile-content>
-                <v-list-tile-sub-title ><v-icon>calendar_today</v-icon> Deadline: {{val.enddate}}</v-list-tile-sub-title>
+                <v-list-tile-sub-title ><v-icon>update</v-icon> Deadline: {{val.enddate}}</v-list-tile-sub-title>
+                <v-list-tile-sub-title ><v-icon>attach_money</v-icon> Fund: {{val.currentFund}}</v-list-tile-sub-title>
+              </v-list-tile-content>
               </v-list-tile-content>
             </v-list-tile>
             <v-card-actions>
@@ -57,6 +59,9 @@
         <div class="row"></div>
         <div class="row"></div>
       </v-layout>
+      <v-layout justify-space-around align-center wrap v-else>
+        <h1>No Current Project Found</h1>
+      </v-layout>
     </v-container>
   </v-content>
 </template>
@@ -81,8 +86,13 @@ export default {
 
     await this.$store.dispatch("web3/getPlatformContractInstance");
   },
+  computed: {
+  },
 
   methods: {
+    progress(currentFund, targetFund) {
+      return parseInt(currentFund) / parseInt(targetFund)
+    },
     donate(event, res) {
       const BCPAddress = address;
       this.$store.state.PlatformContractInstance().donateMission(

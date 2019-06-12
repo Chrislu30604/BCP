@@ -2,20 +2,44 @@
   <div id="navigation">
     <v-navigation-drawer clipped fixed v-model="drawer" app>
       <v-list dense>
-        <v-list-tile>
+        <v-list-tile v-on:click="routeToProject" style="cursor:pointer">
           <v-list-tile-action>
-            <v-icon>dashboard</v-icon>
+            <v-icon>library_books</v-icon>
           </v-list-tile-action>
           <v-list-tile-content>
-            <v-list-tile-title>Dashboard</v-list-tile-title>
+            <v-list-tile-title>Project</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
-        <v-list-tile>
+        <v-list-tile v-on:click="routeToLaunch" style="cursor:pointer">
+          <v-list-tile-action>
+            <v-icon>book</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>
+            <v-list-tile-title>Launch Project</v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>
+        <v-list-tile v-on:click="routeToMyproject" style="cursor:pointer">
+          <v-list-tile-action>
+            <v-icon>folder</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>
+            <v-list-tile-title>MyProject</v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>
+        <v-list-tile v-on:click="routeToAccount" style="cursor:pointer">
           <v-list-tile-action>
             <v-icon>settings</v-icon>
           </v-list-tile-action>
           <v-list-tile-content>
-            <v-list-tile-title>Settings</v-list-tile-title>
+            <v-list-tile-title>Account Info</v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>
+        <v-list-tile v-on:click="routeToLogin" style="cursor:pointer">
+          <v-list-tile-action>
+            <v-icon>get_app</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>
+            <v-list-tile-title>Login</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
       </v-list>

@@ -16,24 +16,14 @@
                   v-validate="'required|max:20'"
                   data-vv-name="title"
                   :error-messages="errors.collect('title')"
-                  v-model="user.title"
+                  v-model="propose.title"
                   prepend-icon="subtitles"
                   label="Enter the Project Title"
                   color="cyan"
                   required
                 ></v-text-field>
                 <v-text-field
-                  v-validate="'required|max:20'"
-                  data-vv-name="name"
-                  :error-messages="errors.collect('name')"
-                  v-model="user.name"
-                  prepend-icon="person"
-                  label="Beneficiary and Sponsor"
-                  color="cyan"
-                  required
-                ></v-text-field>
-                <v-text-field
-                  v-model="user.email"
+                  v-model="propose.email"
                   v-validate="'required|email'"
                   data-vv-name="email"
                   :error-messages="errors.collect('email')"
@@ -44,10 +34,10 @@
                   required
                 ></v-text-field>
                 <v-text-field
-                  v-model="user.dollars"
+                  v-model="propose.targetFund"
                   v-validate="'between:1,1000000'"
-                  data-vv-name="dollars"
-                  :error-messages="errors.collect('dollars')"
+                  data-vv-name="fund"
+                  :error-messages="errors.collect('fund')"
                   prepend-icon="attach_money"
                   label="Estimated point"
                   type="text"
@@ -66,7 +56,7 @@
                 >
                   <template v-slot:activator="{ on }">
                     <v-text-field
-                      v-model="user.enddate"
+                      v-model="propose.enddate"
                       slot="activator"
                       label="End time"
                       prepend-icon="date_range"
@@ -76,7 +66,7 @@
                       required
                     ></v-text-field>
                   </template>
-                  <v-date-picker v-model="user.enddate" @input="menu = false" :min="today"></v-date-picker>
+                  <v-date-picker v-model="propose.enddate" @input="menu = false" :min="today"></v-date-picker>
                 </v-menu>
                 <v-textarea
                   prepend-icon="description"
@@ -84,7 +74,7 @@
                   box
                   label="Description"
                   flat
-                  v-model="user.description"
+                  v-model="propose.description"
                   color="cyan"
                   required
                 ></v-textarea>
@@ -126,18 +116,20 @@
 <script>
 import UploadButton from 'vuetify-upload-button';
 import URL from "../parameter/ip"
+import { mapState } from "vuex";
 export default {
   data() {
     return {
-      user: {
+      propose: {
         title: "",
         name: "",
         email: "",
-        dollars: "",
+        targetFund: "",
+        currentFund: "0",
         enddate: new Date().toISOString().substr(0, 10),
         description: "",
-        file: null,
         url: "",
+        file: null,
       },
       options: {},
       menu: false,
@@ -146,16 +138,21 @@ export default {
   },
 
   async beforeMount() {
-    await this.$store.dispatch("getPlatformContractInstance");
+    await this.$store.dispatch("web3/getPlatformContractInstance");
   },
 
   components: {
     'upload-btn': UploadButton
   },
+  computed: {
+    ...mapState('web3/', {
+      PlatformContractInstance: state => state.PlatformContractInstance,
+    }),
+  },
 
   methods: {
     submitToSmartContract(obj) {
-      this.$store.state.PlatformContractInstance().addMission(
+      this.PlatformContractInstance().addMission(
         obj.title,
         obj.description,
         obj.url,
@@ -181,7 +178,7 @@ export default {
 
           /*   Send to Backend */
           let form = new FormData()
-          form.append('image', this.user.file)
+          form.append('image', this.propose.file)
           // 1. Post image to IMGUR
           const imgURL =  "https://api.imgur.com/3/image"
           const clientID = "8c2fff697c335bc"
@@ -195,39 +192,34 @@ export default {
           )
           .then((response) => {
             console.log(response.data.data.link)
-            this.user.url = response.data.data.link
+            this.propose.url = response.data.data.link
           })
           .catch((error) => {
             console.log(error)
           })
 
           // 2. Post Information to Backend
-
           const url = URL.launch.propose
-          const obj = this.user
+          this.propose.name = this.$store.getters['account/user'].name
+          const obj = this.propose
+          console.log(obj)
           let configs = { headers: {
             'accept': 'application/json',
             'Accept-Language': 'en-US,en;q=0.8',
             'Content-Type': 'multipart/form-data'}};
-          let Postform = new FormData()
-          Postform.append("title", obj.title)
-          Postform.append("name", obj.name)
-          Postform.append("email", obj.email)
-          Postform.append("dollars", obj.dollars)
-          Postform.append("enddate", obj.enddate)
-          Postform.append("description", obj.description)
-          Postform.append("url", obj.url)
 
           // Send to backend
           await this.axios
             .post(url,
-                  Postform,
+                  obj,
                   configs)
             .then((response) => {
               console.log(response)
               /* Send to Smart Contract */
               this.submitToSmartContract(obj);
-
+              setTimeout(() => {
+                this.$router.push('/project')
+              }, 1000);
             })
             .catch((error) => {
               console.log(error)
@@ -236,7 +228,7 @@ export default {
       });
     },
     update(file) {
-      this.user.file = file
+      this.propose.file = file
     },
   }
 };

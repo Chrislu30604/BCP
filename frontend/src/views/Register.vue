@@ -44,6 +44,7 @@ export default {
         name: "",
         identification: "",
         birth: "",
+        registertime: "",
       }
     };
   },
@@ -67,6 +68,8 @@ export default {
       this.register.name = arg.name
       this.register.identification = arg.identification
       this.register.birth = arg.birth
+      this.register.registertime = this.getdate()
+      console.log(this.register.registertime)
       const url = URL.register.register
       let obj = this.register;
       this.axios.post(url, obj)
@@ -87,6 +90,11 @@ export default {
         .catch(error => {
           console.log(error)
         });
+    },
+    getdate() {
+      var d = new Date();
+      var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+      return months[d.getMonth()] + " " + d.getDate().toString() + ", " + d.getFullYear().toString()
     }
   }
 };
