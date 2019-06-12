@@ -147,6 +147,7 @@ export default {
   computed: {
     ...mapState('web3/', {
       PlatformContractInstance: state => state.PlatformContractInstance,
+      coinbase: state => state.web3.coinbase,
     }),
   },
 
@@ -157,10 +158,10 @@ export default {
         obj.description,
         obj.url,
         obj.url,
-        parseInt(obj.dollars, 10),
+        parseInt(obj.targetFund, 10),
         {
           gas: 3000000,
-          from: this.$store.state.web3.coinbase
+          from: this.coinbase
         },
         (err, result) => {
           if (err) {

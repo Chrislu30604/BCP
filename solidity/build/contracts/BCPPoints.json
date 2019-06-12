@@ -15305,6 +15305,77 @@
     "version": "0.5.0+commit.1d4f565a.Emscripten.clang"
   },
   "networks": {
+    "3": {
+      "events": {
+        "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "_from",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "name": "_to",
+              "type": "address"
+            }
+          ],
+          "name": "OwnershipTransferred",
+          "type": "event",
+          "signature": "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0"
+        },
+        "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "from",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "name": "to",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "tokens",
+              "type": "uint256"
+            }
+          ],
+          "name": "Transfer",
+          "type": "event",
+          "signature": "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"
+        },
+        "0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "owner",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "name": "spender",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "tokens",
+              "type": "uint256"
+            }
+          ],
+          "name": "Approval",
+          "type": "event",
+          "signature": "0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925"
+        }
+      },
+      "links": {},
+      "address": "0x461E8913589Ae82303F2e5A8b9502b3B563E3fCc",
+      "transactionHash": "0x9b84da4a1dd754888a0c827de3b2c84f303abc9fb2a303e08f2cd4b58a017438"
+    },
     "5777": {
       "events": {
         "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0": {
@@ -15373,12 +15444,12 @@
         }
       },
       "links": {},
-      "address": "0x594edBb3bE78B88Ad00D5548b7D6bc4b68bC4376",
-      "transactionHash": "0xa1f613d34c183a541c9c8cd5578827d0116efe00ae3c6d77a63dca6ba33c8537"
+      "address": "0x511001052d9d8bda281Ba0460845D41908eD6b83",
+      "transactionHash": "0x06a9b9183e8f76208c45175df9ba5128517cfccaa3c0f4f30f56daa0eb06aa15"
     }
   },
   "schemaVersion": "3.0.2",
-  "updatedAt": "2019-05-21T14:06:57.824Z",
+  "updatedAt": "2019-06-12T11:59:27.175Z",
   "devdoc": {
     "methods": {}
   },

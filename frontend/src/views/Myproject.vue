@@ -35,6 +35,7 @@
 <script>
 import * as BCPContract from "../web3/contract/BCPContract"
 import * as LIPContract from "../web3/contract/LIPContract"
+import { mapState } from "vuex";
 export default {
   data() {
     return {
@@ -49,12 +50,12 @@ export default {
   },
   async beforeCreate() {
     // await this.$store.dispatch('registerWeb3') 
-    await this.$store.dispatch("getPlatformContractInstance");
+    await this.$store.dispatch("web3/getPlatformContractInstance");
     setTimeout(() => {
-        this.$store.state.PlatformContractInstance().getMission(
+        this.PlatformContractInstance().getMission(
         {
             gas: 3000000,
-            from: this.$store.state.web3.coinbase
+            from: this.coinbase
         },
         (err, result) => {
             if (err) {
@@ -71,16 +72,24 @@ export default {
         );
     }, 500);
   },
+
+  computed: {
+    ...mapState('web3/', {
+      PlatformContractInstance: state => state.PlatformContractInstance,
+      coinbase: state => state.web3.coinbase,
+    }),
+  },
+
   methods: {
       closeMission() {
         const BCPAddress = BCPContract.address
         const LIPAddress = LIPContract.address
-        this.$store.state.PlatformContractInstance().closeMission(
+        this.PlatformContractInstance().closeMission(
         BCPAddress,
         LIPAddress,
         {
             gas: 3000000,
-            from: this.$store.state.web3.coinbase
+            from: this.coinbase
         },
         (err, result) => {
             if (err) {

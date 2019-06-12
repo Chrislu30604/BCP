@@ -21,7 +21,6 @@
                 <v-list-tile-sub-title ><v-icon>update</v-icon> Deadline: {{val.enddate}}</v-list-tile-sub-title>
                 <v-list-tile-sub-title ><v-icon>attach_money</v-icon> Fund: {{val.currentFund}}</v-list-tile-sub-title>
               </v-list-tile-content>
-              </v-list-tile-content>
             </v-list-tile>
             <v-card-actions>
               <!--<v-btn flat color="cyan" v-on:click="donate($event, val)">Donate</v-btn>-->
@@ -69,6 +68,7 @@
 <script>
 import {address} from "../web3/contract/BCPContract"
 import URL from "../parameter/ip"
+import { mapState } from "vuex";
 export default {
   data() {
     return {
@@ -86,22 +86,27 @@ export default {
 
     await this.$store.dispatch("web3/getPlatformContractInstance");
   },
-  computed: {
-  },
 
+  computed: {
+    ...mapState('web3/', {
+      PlatformContractInstance: state => state.PlatformContractInstance,
+      coinbase: state => state.web3.coinbase,
+    }),
+  },
   methods: {
     progress(currentFund, targetFund) {
       return parseInt(currentFund) / parseInt(targetFund)
     },
     donate(event, res) {
       const BCPAddress = address;
-      this.$store.state.PlatformContractInstance().donateMission(
+      console.log(this.donateMoney)
+      this.PlatformContractInstance().donateMission(
         BCPAddress,
-        1,
+        2,
         parseInt(this.donateMoney,10),
         {
           gas: 3000000,
-          from: this.$store.state.web3.coinbase
+          from: this.coinbase
         },
         (err, result) => {
           if (err) {
