@@ -47,7 +47,7 @@
             </v-list-tile>
             <v-card-actions>
               <!--<v-btn flat color="cyan" v-on:click="donate($event, val)">Donate</v-btn>-->
-              <v-btn flat color="cyan" v-on:click="showModal($event, val)">Donate</v-btn>
+              <v-btn flat color="cyan" v-on:click="showModal($event, val, idx)">Donate</v-btn>
               <v-btn flat color="orange">Detail</v-btn>
             </v-card-actions>
           </v-card>
@@ -72,7 +72,8 @@ export default {
       item: [],
       dialog: false,
       donateMoney: "",
-      modal: ""
+      modal: "",
+      idx: 0,
     };
   },
   async beforeCreate() {
@@ -96,9 +97,10 @@ export default {
       return parseInt(currentFund) / parseInt(targetFund)
     },
 
-    showModal(event, res) {
+    showModal(event, res, idx) {
       console.log(res.title)
       this.modal = res
+      this.idx = idx + 1
       this.dialog = true;
     },
 
@@ -111,10 +113,10 @@ export default {
       event.preventDefault()
       this.dialog = false
       const BCPAddress = address;
-      console.log("missionId is :", res.missionID)
+      console.log("missionId is :", this.idx)
       this.PlatformContractInstance().donateMission(
         BCPAddress,
-        parseInt(res.missionID),
+        this.idx,
         parseInt(this.donateMoney,10),
         {
           gas: 3000000,

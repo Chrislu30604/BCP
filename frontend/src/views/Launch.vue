@@ -150,7 +150,6 @@ export default {
         description: "",
         url: "",
         file: null,
-        missionID: "",
       },
       options: {},
       menu: false,
@@ -204,7 +203,7 @@ export default {
                     if (receipt.status == "0x1") {
                       console.log("Close dialog")
                       clearInterval(timer)
-                      const MissionID = await this.getMission()
+                      let MissionID = await this.getMission()
                       this.dialog = false
                       this.contractOK = true
                       resolve(MissionID)    
@@ -230,9 +229,9 @@ export default {
               console.log(err);
               reject(err)
             } else {
+              console.log("Mission 1D = ", result[0].c)
               console.log("Mission 1D = ", result[0].c[0])
-              
-              resolve(result[0].c[0])
+              resolve(result[0])
             }
           }
         )
@@ -270,10 +269,10 @@ export default {
           const obj = this.propose
           const missionID = await this.submitToSmartContract(obj);
 
+          setTimeout(async() => {
           if (this.contractOK == true) {
             // 4. Post Information to Backend
             console.log("4. Post MissionID to backend")
-            this.propose.missionID = missionID
             const backendObj = this.propose
             const url = URL.launch.propose
             let configs = { headers: {
@@ -297,6 +296,7 @@ export default {
                 console.log(error)
               })
             }
+          }, 2000);
         }
       });
     },

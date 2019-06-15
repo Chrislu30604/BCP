@@ -34,7 +34,6 @@ type Propose struct {
 	Enddate     string `json:"enddate" bson:"enddate"`
 	Description string `json:"description" bson:"description"`
 	URL         string `json:"url" bson:"url"`
-	MissionID   string `json:"missionID" bson:"missionID"`
 }
 
 type Register struct {
