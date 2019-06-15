@@ -34,6 +34,7 @@ type Propose struct {
 	Enddate     string `json:"enddate" bson:"enddate"`
 	Description string `json:"description" bson:"description"`
 	URL         string `json:"url" bson:"url"`
+	MissionID   string `json:"missionID" bson:"missionID"`
 }
 
 type Register struct {
@@ -44,6 +45,8 @@ type Register struct {
 	Identification string `json:"identification" bson:"identification"`
 	Birth          string `json:"birth" bson:"birth"`
 	Registertime   string `json:"registertime" bson:"registertime"`
+	Network        string `json:"network" bson:"network"`
+	Coinbase       string `json:"coinbase" bson:"coinbase"`
 	Token          string `json:"token" bson:"token"`
 }
 
@@ -203,6 +206,47 @@ func handleQueryName(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+}
+
+func handleQueryMetamask(c *gin.Context) {
+	var parser struct {
+		Network  string `json:"network" bson:"network"`
+		Coinbase string `json:"coinbase" bson:"coinbase"`
+	}
+	// 1.Check Receive Data
+	rawdata, err := c.GetRawData()
+	if err != nil {
+		log.Println("ERROR Json Raw Data")
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	// 2.Unserialize
+	if err = json.Unmarshal(rawdata, &parser); err != nil {
+		log.Println("ERROR Json Key")
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	// 4.Find Name in Mongodb
+	log.Println("start query....")
+	parse := bson.D{
+		{"$and",
+			bson.A{
+				bson.D{{"network", parser.Network}},
+				bson.D{{"coinbase", parser.Coinbase}}},
+		}}
+	res, err := Find("user", "account", parse)
+	// 5. If find the email or id in db, then
+	if err != nil {
+		log.Println("Error Query in mongodb")
+		c.JSON(http.StatusBadRequest, gin.H{"status": err.Error()})
+	}
+	if len(res) == 0 {
+		c.JSON(http.StatusOK, gin.H{"status": "OK"})
+	} else {
+		c.JSON(http.StatusOK, gin.H{"status": "The Account had been registed!!!!NONO"})
+		return
+	}
+	return
 }
 
 func handleRegister(c *gin.Context) {

@@ -3,6 +3,29 @@
     <v-container fluid fill-height grid-list-xl style="maxWidth: 80%;">
       <v-layout justify-space-around row wrap v-if="item.length">
         <div v-for="(val, idx) in item" :key="idx" class="row">
+          <v-dialog v-model="dialog" persistent max-width="400">
+            <v-card>
+              <v-layout justify-space-around row wrap>
+                <v-card-title class="headline">DONATE Y0UR MONEY</v-card-title>
+                <v-flex xs10>
+                <v-text-field
+                  v-model="donateMoney"
+                  label="BCP Poiint"
+                  prefix="$"
+                  color="cyan"
+                ></v-text-field>
+                </v-flex>
+                <v-flex xs10>
+                  <v-card-text>Are Your Sure to Donate {{modal.title}} ?</v-card-text>
+                </v-flex>
+                <v-card-actions>
+                  <v-spacer></v-spacer>
+                  <v-btn color="red" flat v-on:click="disableDialog">Disagree</v-btn>
+                  <v-btn color="green darken-1" flat v-on:click="donate($event, modal)">Agree</v-btn>
+                </v-card-actions>
+              </v-layout>
+            </v-card>
+          </v-dialog>
           <v-card>
             <v-card-title>
               <div>
@@ -15,42 +38,16 @@
             <v-list-tile>
               <v-list-tile-content>
                 <v-list-tile-sub-title ><v-icon>pregnant_woman</v-icon> Launcher : {{val.name}}</v-list-tile-sub-title>
-                <v-list-tile-sub-title ><v-icon>attach_money</v-icon> Fund: {{val.targetFund}}</v-list-tile-sub-title>
+                <v-list-tile-sub-title ><v-icon>attach_money</v-icon> Target Fund: {{val.targetFund}}</v-list-tile-sub-title>
               </v-list-tile-content>
               <v-list-tile-content>
                 <v-list-tile-sub-title ><v-icon>update</v-icon> Deadline: {{val.enddate}}</v-list-tile-sub-title>
-                <v-list-tile-sub-title ><v-icon>attach_money</v-icon> Fund: {{val.currentFund}}</v-list-tile-sub-title>
+                <v-list-tile-sub-title ><v-icon>attach_money</v-icon> Current Fund: {{val.currentFund}}</v-list-tile-sub-title>
               </v-list-tile-content>
             </v-list-tile>
             <v-card-actions>
               <!--<v-btn flat color="cyan" v-on:click="donate($event, val)">Donate</v-btn>-->
-              <v-dialog v-model="dialog" persistent max-width="400">
-                <template v-slot:activator="{ on }">
-                  <!-- <v-btn color="primary" dark v-on="on">Open Dialog</v-btn>-->
-                  <v-btn flat color="cyan" v-on="on">Donate</v-btn>
-                </template>
-                <v-card>
-                  <v-layout justify-space-around row wrap>
-                    <v-card-title class="headline">DONATE Y0UR MONEY</v-card-title>
-                    <v-flex xs10>
-                    <v-text-field
-                      v-model="donateMoney"
-                      label="BCP Poiint"
-                      prefix="$"
-                      color="cyan"
-                    ></v-text-field>
-                    </v-flex>
-                    <v-flex xs10>
-                      <v-card-text>Are Your Sure to Donate {{val.title}} ?</v-card-text>
-                    </v-flex>
-                    <v-card-actions>
-                      <v-spacer></v-spacer>
-                      <v-btn color="red" flat @click="dialog = false">Disagree</v-btn>
-                      <v-btn color="green darken-1" flat @click="dialog = false" v-on:click="donate($event,val)">Agree</v-btn>
-                    </v-card-actions>
-                  </v-layout>
-                </v-card>
-              </v-dialog>
+              <v-btn flat color="cyan" v-on:click="showModal($event, val)">Donate</v-btn>
               <v-btn flat color="orange">Detail</v-btn>
             </v-card-actions>
           </v-card>
@@ -75,6 +72,7 @@ export default {
       item: [],
       dialog: false,
       donateMoney: "",
+      modal: ""
     };
   },
   async beforeCreate() {
@@ -97,9 +95,22 @@ export default {
     progress(currentFund, targetFund) {
       return parseInt(currentFund) / parseInt(targetFund)
     },
+
+    showModal(event, res) {
+      console.log(res.title)
+      this.modal = res
+      this.dialog = true;
+    },
+
+    disableDialog(event, res) {
+      event.preventDefault()
+      this.dialog = false
+    },
+
     donate(event, res) {
+      event.preventDefault()
+      this.dialog = false
       const BCPAddress = address;
-      console.log(this.donateMoney)
       this.PlatformContractInstance().donateMission(
         BCPAddress,
         2,
@@ -113,10 +124,18 @@ export default {
             console.log(err);
           } else {
             console.log(result);
+            this.changeProjectInfo(this.donateMoney, res)
           }
         }
       );
-    }
+    },
+
+    changeProjectInfo(donateMoney, res) {
+      res.currentFund = (parseInt(res.currentFund) + parseInt(donateMoney)).toString()
+      axios.post(
+        
+      )
+    },
   }
 };
 </script>

@@ -130,6 +130,7 @@ export default {
         description: "",
         url: "",
         file: null,
+        missionID: "",
       },
       options: {},
       menu: false,
@@ -153,31 +154,54 @@ export default {
 
   methods: {
     submitToSmartContract(obj) {
-      this.PlatformContractInstance().addMission(
-        obj.title,
-        obj.description,
-        obj.url,
-        obj.url,
-        parseInt(obj.targetFund, 10),
-        {
-          gas: 3000000,
-          from: this.coinbase
-        },
-        (err, result) => {
-          if (err) {
-            console.log(err);
-          } else {
-            console.log(result)
+      return new Promise((resolve, reject) => {
+        this.PlatformContractInstance().addMission(
+          obj.title,
+          obj.description,
+          obj.url,
+          obj.url,
+          parseInt(obj.targetFund, 10),
+          {
+            gas: 3000000,
+            from: this.coinbase
+          },
+          (err, result) => {
+            if (err) {
+              console.log(err);
+              reject(err)
+            } else {
+              console.log(result)
+              resolve(result)
+            }
           }
-        }
-      );
+        );
+      })
+    },
+    getMissionId() {
+      return new Promise((resolve, reject) => {
+        this.PlatformContractInstance().getMission(
+          {
+            gas: 3000000,
+            from: this.coinbase
+          },
+          (err, result) => {
+            if (err) {
+              console.log(err);
+              reject(err)
+            } else {
+              console.log(result)
+              resolve(result[0])
+              console.log("Mission ID : ", result[0])
+            }
+          }
+        );
+      })
     },
 
     submit() {
       this.$validator.validateAll().then(async (valid) => {
         if (valid) {
 
-          /*   Send to Backend */
           let form = new FormData()
           form.append('image', this.propose.file)
           // 1. Post image to IMGUR
@@ -198,12 +222,19 @@ export default {
           .catch((error) => {
             console.log(error)
           })
-
-          // 2. Post Information to Backend
-          const url = URL.launch.propose
+          
+          // 3. Send to Contract
           this.propose.name = this.$store.getters['account/user'].name
           const obj = this.propose
-          console.log(obj)
+          await this.submitToSmartContract(obj);
+
+          // 4. Get Mission ID
+          const missionID = await this.getMissionId().toString();
+          
+          // 5. Post Information to Backend
+          this.propose.missionID = missionID
+          const backendObj = this.propose
+          const url = URL.launch.propose
           let configs = { headers: {
             'accept': 'application/json',
             'Accept-Language': 'en-US,en;q=0.8',
@@ -212,12 +243,11 @@ export default {
           // Send to backend
           await this.axios
             .post(url,
-                  obj,
+                  backendObj,
                   configs)
             .then((response) => {
               console.log(response)
               /* Send to Smart Contract */
-              this.submitToSmartContract(obj);
               setTimeout(() => {
                 this.$router.push('/project')
               }, 1000);

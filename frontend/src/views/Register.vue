@@ -4,21 +4,24 @@
       <div id="register">
         <div id="login_header">
           <img v-if="pass==0" src="../assets/chicken_small.svg">
-          <img v-if="pass==1" src="../assets/chicken.svg">
-          <img v-if="pass==2" src="../assets/chicken_hot.svg">
-          <div v-if="pass!=2">
+          <img v-else-if="pass==1" src="../assets/chicken.svg">
+          <img v-else-if="pass==2" src="../assets/metamask.png">
+          <img v-else-if="pass==3" src="../assets/chicken_hot.svg">
+          <div v-if="pass!=3">
             <h2>Register BCP</h2>
             <p>
               If you already have BCP account, click
               <router-link to="/login">sigin</router-link>
             </p>
           </div>
-          <div v-else>
+          <div v-if="pass==3">
             <h2>You succeesfully register!</h2>
+            <h3>Redirect to Project after 5 sec </h3>
           </div>
         </div>
-        <RegisterName v-if="pass==0" v-on:triggerSuccess="success_and_next"></RegisterName>
-        <RegisterDetail v-if="pass==1" v-on:triggerSuccess="post_and_next"></RegisterDetail>
+        <RegisterName v-if="pass==0" v-on:triggerSuccess="set_userinfo"></RegisterName>
+        <RegisterDetail v-if="pass==1" v-on:triggerSuccess="set_userdetail"></RegisterDetail>
+        <RegisterMetamask v-if="pass==2" v-on:triggerSuccess="set_metamask"></RegisterMetamask>
       </div>
     </v-container>
     <v-footer style="position:absolute;bottom:0px;width:100%">
@@ -31,11 +34,12 @@
 <script>
 import RegisterName from "@/components/RegisterName"
 import RegisterDetail from "@/components/RegisterDetail"
+import RegisterMetamask from '@/components/RegisterMetamask'
 import URL from "../parameter/ip"
 export default {
   data() {
     return {
-      progress_bar: 33,
+      progress_bar: 25,
       pass: 0,
       register: {
         id: "",
@@ -45,33 +49,44 @@ export default {
         identification: "",
         birth: "",
         registertime: "",
+        network: "",
+        coinbase: "",
       }
     };
   },
   components: {
     RegisterName,
     RegisterDetail,
+    RegisterMetamask,
   },
 
   methods: {
     success() {
       this.pass = this.pass + 1;
-      this.progress_bar = this.progress_bar + 33;
+      this.progress_bar = this.progress_bar + 25;
     },
-    success_and_next(arg){
+    set_userinfo(arg){
       this.register.id = arg.id
       this.register.password = arg.password
       this.register.email = arg.email
       this.success()
     },
-    post_and_next(arg) {
+    set_userdetail(arg){
       this.register.name = arg.name
       this.register.identification = arg.identification
       this.register.birth = arg.birth
       this.register.registertime = this.getdate()
-      console.log(this.register.registertime)
+      this.success()
+    },
+    set_metamask(arg) {
+      this.register.network = arg.network
+      this.register.coinbase = arg.coinbase
+      this.post_and_next()
+    },
+    post_and_next() {
       const url = URL.register.register
       let obj = this.register;
+      console.log(obj)
       this.axios.post(url, obj)
         .then(response => {
           if (response.data.status === "OK") {
@@ -84,7 +99,7 @@ export default {
             this.success()
             setTimeout(() => {
               this.$router.push({path:'/project'})
-            }, 1000);
+            }, 5000);
           }
         })
         .catch(error => {

@@ -39,6 +39,9 @@
         required
       ></v-text-field>
     </v-form>
+    <div style="display:flex; justify-content:center">
+      <p id="error_message"></p>
+    </div>
     <v-btn color="info" depressed @click="submit">continue</v-btn>
   </div>
 </template>
@@ -67,3 +70,9 @@ export default {
   }
 };
 </script>
+
+<style lang="scss">
+#error_message {
+  color: #FD5151;
+}
+</style>

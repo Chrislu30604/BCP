@@ -68,7 +68,7 @@ contract LIPPoints is ERC20ProInterface, Ownership {
     
     
     /*-----------------Additional Function-----------------*/
-    function distributePoints(address to, uint tokens) public onlyOwner returns (bool success) {
+    function distributePoints(address to, uint tokens) public returns (bool success) {
         require(balances[address(this)] > tokens);
         require(tokens > 0);
         

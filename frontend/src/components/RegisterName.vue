@@ -39,6 +39,9 @@
         required
       ></v-text-field>
     </v-form>
+    <div style="display:flex; justify-content:center">
+      <p id="error_message"></p>
+    </div>
     <v-btn color="info" depressed @click="submit">continue</v-btn>
   </div>
 </template>
@@ -54,7 +57,7 @@ export default {
         id: "",
         password: "",
         email: ""
-      }
+      },
     };
   },
   methods: {
@@ -70,6 +73,9 @@ export default {
               if (response.data.status === "OK") {
                 console.log("You can continue");
                 this.$emit('triggerSuccess', obj)
+              } else {
+                const error_message = response.data.status
+                document.getElementById('error_message').innerHTML = error_message
               }
             })
             .catch(error => {
@@ -81,3 +87,10 @@ export default {
   }
 };
 </script>
+
+<style lang="scss">
+#error_message {
+  color: #FD5151;
+}
+</style>
+

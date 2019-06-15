@@ -1,7 +1,7 @@
 <template>
   <v-content id="my-proj">
     <v-container fluid fill-height grid-list-xl style="maxWidth: 80%;">
-      <v-layout justify-space-around row wrap>
+      <v-layout justify-space-around row wrap v-if="item.title !== ''">
         <div v-bind="item" class="row" >
           <v-card>
             <v-card-title>
@@ -25,6 +25,9 @@
         </div>
         <div class="row"></div>
         <div class="row"></div>
+      </v-layout>
+      <v-layout justify-space-around align-center wrap v-else>
+        <h1>You don't have the project</h1>
       </v-layout>
     </v-container>
   </v-content>
