@@ -109,6 +109,26 @@
           </div>
         </v-flex>
       </v-layout>
+      <v-dialog
+        v-model="dialog"
+        hide-overlay
+        persistent
+        width="300"
+      >
+        <v-card
+          color="primary"
+          dark
+        >
+          <v-card-text>
+            Wait for The Contract Finish
+            <v-progress-linear
+              indeterminate
+              color="white"
+              class="mb-0"
+            ></v-progress-linear>
+          </v-card-text>
+        </v-card>
+      </v-dialog>
     </v-container>
   </v-content>
 </template>
@@ -134,7 +154,10 @@ export default {
       },
       options: {},
       menu: false,
-      today: new Date().toISOString().substr(0, 10)
+      today: new Date().toISOString().substr(0, 10),
+      web3: null,
+      dialog: false,
+      contractOK: false,
     };
   },
 
@@ -149,6 +172,7 @@ export default {
     ...mapState('web3/', {
       PlatformContractInstance: state => state.PlatformContractInstance,
       coinbase: state => state.web3.coinbase,
+      web3Instance: state => state.web3.web3Instance,
     }),
   },
 
@@ -165,36 +189,53 @@ export default {
             gas: 3000000,
             from: this.coinbase
           },
-          (err, result) => {
+          async (err, result) => {
             if (err) {
               console.log(err);
               reject(err)
             } else {
               console.log(result)
-              resolve(result)
+              let web3 = await new Web3(window.web3.currentProvider)
+              this.dialog = true
+              var timer = setInterval(async () => {
+                await web3.eth.getTransactionReceipt(result, async (err, receipt) => {
+                  if(receipt !== null) {
+                    console.log(receipt.status)
+                    if (receipt.status == "0x1") {
+                      console.log("Close dialog")
+                      clearInterval(timer)
+                      const MissionID = await this.getMission()
+                      this.dialog = false
+                      this.contractOK = true
+                      resolve(MissionID)    
+                    }
+                  }
+                })
+              }, 500);
             }
           }
         );
       })
     },
-    getMissionId() {
+
+    getMission() {
       return new Promise((resolve, reject) => {
         this.PlatformContractInstance().getMission(
           {
             gas: 3000000,
             from: this.coinbase
           },
-          (err, result) => {
+          async (err, result) => {
             if (err) {
               console.log(err);
               reject(err)
             } else {
-              console.log(result)
-              resolve(result[0])
-              console.log("Mission ID : ", result[0])
+              console.log("Mission 1D = ", result[0].c[0])
+              
+              resolve(result[0].c[0])
             }
           }
-        );
+        )
       })
     },
 
@@ -224,37 +265,38 @@ export default {
           })
           
           // 3. Send to Contract
+          console.log("3. Send to Contract")
           this.propose.name = this.$store.getters['account/user'].name
           const obj = this.propose
-          await this.submitToSmartContract(obj);
+          const missionID = await this.submitToSmartContract(obj);
 
-          // 4. Get Mission ID
-          const missionID = await this.getMissionId().toString();
-          
-          // 5. Post Information to Backend
-          this.propose.missionID = missionID
-          const backendObj = this.propose
-          const url = URL.launch.propose
-          let configs = { headers: {
-            'accept': 'application/json',
-            'Accept-Language': 'en-US,en;q=0.8',
-            'Content-Type': 'multipart/form-data'}};
+          if (this.contractOK == true) {
+            // 4. Post Information to Backend
+            console.log("4. Post MissionID to backend")
+            this.propose.missionID = missionID
+            const backendObj = this.propose
+            const url = URL.launch.propose
+            let configs = { headers: {
+              'accept': 'application/json',
+              'Accept-Language': 'en-US,en;q=0.8',
+              'Content-Type': 'multipart/form-data'}};
 
-          // Send to backend
-          await this.axios
-            .post(url,
-                  backendObj,
-                  configs)
-            .then((response) => {
-              console.log(response)
-              /* Send to Smart Contract */
-              setTimeout(() => {
-                this.$router.push('/project')
-              }, 1000);
-            })
-            .catch((error) => {
-              console.log(error)
-            })
+            // Send to backend
+            await this.axios
+              .post(url,
+                    backendObj,
+                    configs)
+              .then((response) => {
+                console.log(response)
+                /* Send to Smart Contract */
+                setTimeout(() => {
+                  this.$router.push('/project')
+                }, 1000);
+              })
+              .catch((error) => {
+                console.log(error)
+              })
+            }
         }
       });
     },

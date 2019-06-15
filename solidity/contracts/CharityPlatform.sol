@@ -4,7 +4,6 @@ import "./lib/SafeMath.sol";
 import "./lib/ERC20ProInterface.sol";
 import "./Escrow.sol";
 
-
 contract CharityPlatform{
     using SafeMath for uint;
     
@@ -29,7 +28,7 @@ contract CharityPlatform{
         mapping(address => uint) ledger;
     }
     
-    constructor() public {
+    constructor() public payable {
         missionIndex = 0;
         exchangeRate = 2;
     }
@@ -40,7 +39,7 @@ contract CharityPlatform{
         string memory _description,
         string memory _imgHash,
         string memory _minorityProofHash,
-        uint _targetFund) public returns (bool success) {
+        uint _targetFund) public returns (uint missionId, bool success) {
         // Check whether msg.sender has had already applied for mission
         require(appliedMissionList[msg.sender] != true);
         
@@ -55,7 +54,7 @@ contract CharityPlatform{
         // Create Mission Escrow 
         Escrow escrow = new Escrow(missionIndex);
         escrowMissionList[missionIndex] = address(escrow);
-        return true;
+        return (missionIndex, true);
     }
     
 

@@ -111,9 +111,10 @@ export default {
       event.preventDefault()
       this.dialog = false
       const BCPAddress = address;
+      console.log("missionId is :", res.missionID)
       this.PlatformContractInstance().donateMission(
         BCPAddress,
-        2,
+        parseInt(res.missionID),
         parseInt(this.donateMoney,10),
         {
           gas: 3000000,
