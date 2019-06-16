@@ -73,7 +73,7 @@ export default {
             .then(async (response) => {
               if (response.data.status === "OK") {
                 // if OK distribute linepoint to it
-                await this.distributeLIP()                
+                await this.distributeLIP()              
                 this.$emit('triggerSuccess', obj)
               } else {
                 const error_message = response.data.status

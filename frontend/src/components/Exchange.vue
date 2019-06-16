@@ -120,6 +120,26 @@
     <div v-else-if="isSubmit" id="status">
       <h1>You are Successfully exchange point!!</h1>
     </div>
+    <v-dialog
+      v-model="dialog"
+      hide-overlay
+      persistent
+      width="300"
+    >
+      <v-card
+        color="primary"
+        dark
+      >
+        <v-card-text>
+          Wait for The Transaction Finish
+          <v-progress-linear
+            indeterminate
+            color="white"
+            class="mb-0"
+          ></v-progress-linear>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -138,6 +158,7 @@ export default {
         ex_bcppoint: 0,
       },
       isSubmit: false,
+      dialog: false,
     };
   },
 
@@ -191,11 +212,25 @@ export default {
               gas: 3000000,
               from: this.coinbase
             },
-            (err, result) => {
+            async (err, result) => {
               if (err) {
                 console.log(err);
               } else {
                 console.log(result)
+                let web3 = await new Web3(window.web3.currentProvider)
+                this.dialog = true
+                var timer = setInterval(async () => {
+                  await web3.eth.getTransactionReceipt(result, async (err, receipt) => {
+                    if(receipt !== null) {
+                      console.log(receipt.status)
+                      if (receipt.status == "0x1") {
+                        console.log("Close dialog")
+                        clearInterval(timer)
+                        this.dialog = false
+                      }
+                    }
+                  })
+                }, 500);
                 this.isSubmit = true
               }
             }
@@ -216,11 +251,27 @@ export default {
               gas: 3000000,
               from: this.coinbase
             },
-            (err, result) => {
+            async(err, result) => {
               if (err) {
                 console.log(err);
+                reject()
               } else {
                 console.log(result)
+                let web3 = await new Web3(window.web3.currentProvider)
+                this.dialog = true
+                var timer = setInterval(async () => {
+                  await web3.eth.getTransactionReceipt(result, async (err, receipt) => {
+                    if(receipt !== null) {
+                      console.log(receipt.status)
+                      if (receipt.status == "0x1") {
+                        console.log("Close dialog")
+                        clearInterval(timer)
+                        this.dialog = false
+                        resolve()    
+                      }
+                    }
+                  })
+                }, 500);
                 this.isSubmit = true
               }
             }

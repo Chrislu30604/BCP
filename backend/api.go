@@ -103,8 +103,49 @@ func handleLogin(c *gin.Context) {
 	}
 }
 
+func handleUpdatePropose(c *gin.Context) {
+	// 1. Parser the purpose info
+	parser := Propose{}
+	rawdata, err := c.GetRawData()
+	if err != nil {
+		log.Println("ERROR Json Raw Data")
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	log.Println(string(rawdata))
+	// 2.Unserialize
+	if err = json.Unmarshal(rawdata, &parser); err != nil {
+		log.Println("ERROR Json Key")
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	// 3. Regex Check
+	if regexEmail.MatchString(parser.Email) &&
+		regexDollars.MatchString(parser.TargetFund) &&
+		regexDollars.MatchString(parser.CurrentFund) &&
+		regexName.MatchString(parser.Name) {
+		// 4. Update the mongo
+		log.Println("Insert in MongoDB")
+		query := bson.D{
+			{"$and",
+				bson.A{
+					bson.D{{"title", parser.Title}},
+					bson.D{{"url", parser.URL}}},
+			}}
+		replace := bson.D{{"$set", bson.D{{"currentFund", parser.CurrentFund}}}}
+		res, err := UpdateOne("user", "propose", &query, &replace)
+		if err != nil {
+			log.Println("Insert Fail")
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		log.Println(res)
+		c.JSON(http.StatusOK, gin.H{"status": "OK"})
+	}
+}
+
 func handlePropose(c *gin.Context) {
-	// 2. Parser the purpose info
+	// 1. Parser the purpose info
 	parser := Propose{}
 	rawdata, err := c.GetRawData()
 	if err != nil {
@@ -123,7 +164,6 @@ func handlePropose(c *gin.Context) {
 	if regexEmail.MatchString(parser.Email) &&
 		regexDollars.MatchString(parser.TargetFund) {
 		// 4. Insert To DB
-		log.Println("Insert in MongoDB")
 		res, err := InsertOne("user", "propose", &parser)
 		if err != nil {
 			log.Println("Insert Fail")

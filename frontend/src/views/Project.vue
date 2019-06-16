@@ -94,7 +94,7 @@ export default {
   },
   methods: {
     progress(currentFund, targetFund) {
-      return parseInt(currentFund) / parseInt(targetFund)
+      return parseInt(currentFund) / parseInt(targetFund) * 100
     },
 
     showModal(event, res, idx) {
@@ -117,7 +117,7 @@ export default {
       this.PlatformContractInstance().donateMission(
         BCPAddress,
         this.idx,
-        parseInt(this.donateMoney,10),
+        parseInt(this.donateMoney, 10),
         {
           gas: 3000000,
           from: this.coinbase
@@ -135,9 +135,15 @@ export default {
 
     changeProjectInfo(donateMoney, res) {
       res.currentFund = (parseInt(res.currentFund) + parseInt(donateMoney)).toString()
-      axios.post(
-        
-      )
+      const url = URL.launch.update
+      console.log(res)
+      this.axios.post(url, res)
+      .then((response) => {
+        console.log(response)
+      })
+      .catch((error) => {
+        console.log(error)
+      })
     },
   }
 };

@@ -4,7 +4,6 @@ import VeeValidate from 'vee-validate'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
 import VueCookies from 'vue-cookies'
-import VModal from 'vue-js-modal'
 import App from './App.vue'
 import router from './router'
 import {store} from './store/store'
@@ -14,7 +13,6 @@ import URL from './parameter/ip'
 Vue.use(VueAxios, axios);
 Vue.use(VeeValidate);
 Vue.use(VueCookies)
-Vue.use(VModal)
 
 Vue.config.productionTip = false
 

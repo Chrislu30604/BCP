@@ -120,7 +120,7 @@
           dark
         >
           <v-card-text>
-            Wait for The Contract Finish
+            Wait for The Transaction Finish
             <v-progress-linear
               indeterminate
               color="white"

@@ -47,6 +47,15 @@ func FindOne(db, collection string, query interface{}) (interface{}, error) {
 	return v, err
 }
 
+func UpdateOne(db, collection string, query, replace interface{}) (interface{}, error) {
+	coll := Connect(db, collection)
+	result, err := coll.UpdateOne(context.Background(), query, replace)
+	if err != nil {
+		return nil, err
+	}
+	return result, err
+}
+
 /*
 func FindAll(db, collection string) {
 	coll := Connect(db, collection)
