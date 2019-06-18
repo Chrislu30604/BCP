@@ -5,6 +5,12 @@
   - [Account & Currency](#Account--Currency)
   - [Launch Project](#Launch-Project)
 
+<style>
+img {
+    width: 80%;
+}
+</style>
+
 ## Register
 Follow the instruction:
 1. Enter you ID, password, email and the backend will re-check the ID and email is already used or not                   
