@@ -1,5 +1,10 @@
 # BCP Charity Platform User Manual
 
+- [BCP Charity Platform User Manual](#BCP-Charity-Platform-User-Manual)
+  - [Register](#Register)
+  - [Account & Currency](#Account--Currency)
+  - [Launch Project](#Launch-Project)
+
 ## Register
 Follow the instruction:
 1. Enter you ID, password, email and the backend will re-check the ID and email is already used or not                   
@@ -17,19 +22,19 @@ Follow the instruction:
 - At **account/overview**, it shows your account info, and you can revise it (<font color="green">TODO</font>)
     ![](https://i.imgur.com/OBDTJ44.png)
 
-- At **account/exchange**, it shows the previous 500 LIP, And you can exchange from <font color=blue>LIP to BCP</font> points
+- At **account/exchange**, it shows the previous 500 LIP, And you can exchange from <font color=blue>LIP to BCP</font> points    
     ![](https://i.imgur.com/iALERCJ.png)
     ![](https://i.imgur.com/yTk6pia.png)
 
 ## Launch Project
-- A account **ONLY** can deploy once!!
+- A account **ONLY** can deploy once!!             
     ![](https://i.imgur.com/ZE35O9h.png)
 
-- After the confirmation, the current project show your propose!
+- After the confirmation, the current project show your propose!          
     ![](https://i.imgur.com/5equpgl.png)
 
-- **Myproject** shows your launch project
+- **Myproject** shows your launch project                    
     ![](https://i.imgur.com/tAER9VV.png)
 
-- Another one can donate your project
+- Another one can donate your project                  
     ![](https://i.imgur.com/Ws1FVBT.png)
